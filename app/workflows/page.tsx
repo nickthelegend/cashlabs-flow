@@ -1,7 +1,7 @@
 "use client"
 
 import { motion } from "framer-motion"
-import { Shield, Coins, Users, Lock, Zap, ArrowRight, RefreshCw, Layers } from "lucide-react"
+import { Shield, Coins, Users, Lock, Zap, ArrowRight, RefreshCw, Layers, Clock, Landmark, Flame, Eye } from "lucide-react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
 
@@ -45,6 +45,46 @@ const workflows = [
         bg: "bg-amber-500/10",
         tags: ["Utility", "Optimization"],
         link: "/workflow/dust-collector"
+    },
+    {
+        id: "hodl-vault",
+        title: "HODL Vault",
+        description: "Lock your BCH in a time-locked smart contract. Cannot be spent until the target block height is reached.",
+        icon: Clock,
+        color: "text-rose-500",
+        bg: "bg-rose-500/10",
+        tags: ["Savings", "Smart Contract"],
+        link: "/workflow/hodl-vault"
+    },
+    {
+        id: "trustless-escrow",
+        title: "Trustless Escrow",
+        description: "Secure 2-of-3 multisig setup for p2p trades. Funds are only released upon mutual agreement.",
+        icon: Landmark,
+        color: "text-emerald-500",
+        bg: "bg-emerald-500/10",
+        tags: ["Multisig", "Trustless"],
+        link: "/workflow/escrow"
+    },
+    {
+        id: "nft-minting-press",
+        title: "NFT Minting Press",
+        description: "Batch mint a library of unique NFTs with custom metadata and images in a single automated flow.",
+        icon: Flame,
+        color: "text-orange-500",
+        bg: "bg-orange-500/10",
+        tags: ["NFTs", "Batch"],
+        link: "/workflow/nft-press"
+    },
+    {
+        id: "watchtower-monitor",
+        title: "Watchtower Monitor",
+        description: "Automated monitor that triggers a specific BCH action the second an address receives funds.",
+        icon: Eye,
+        color: "text-cyan-500",
+        bg: "bg-cyan-500/10",
+        tags: ["Automation", "Security"],
+        link: "/workflow/watchtower"
     }
 ]
 

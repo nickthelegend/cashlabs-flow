@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Zap, Code2, Workflow, ArrowRight, CheckCircle, Layers, Rocket, Coins, FileCode, Shield, RefreshCcw, Users, Lock } from "lucide-react"
+import { Zap, Code2, Workflow, ArrowRight, CheckCircle, Layers, Rocket, Coins, FileCode, Shield, RefreshCw, Users, Lock, Clock, Landmark, Flame } from "lucide-react"
 
 export default function Home() {
   const containerVariants = {
@@ -107,7 +107,7 @@ export default function Home() {
 
             <motion.div variants={itemVariants} className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 opacity-50">
               <div className="flex items-center gap-2 grayscale hover:grayscale-0 transition-all cursor-default">
-                <RefreshCcw className="w-4 h-4" /> <span className="text-[10px] font-bold uppercase tracking-widest">CoinJoin Ready</span>
+                <RefreshCw className="w-4 h-4" /> <span className="text-[10px] font-bold uppercase tracking-widest">CoinJoin Ready</span>
               </div>
               <div className="flex items-center gap-2 grayscale hover:grayscale-0 transition-all cursor-default">
                 <Shield className="w-4 h-4" /> <span className="text-[10px] font-bold uppercase tracking-widest">Zero-Knowledge</span>
@@ -138,7 +138,7 @@ export default function Home() {
             </Link>
           </div>
 
-          <div className="grid md:grid-cols-3 gap-6">
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
             {[
               {
                 title: "Private Mixer Pro",
@@ -160,6 +160,27 @@ export default function Home() {
                 icon: Lock,
                 link: "/workflows",
                 color: "text-purple-500"
+              },
+              {
+                title: "HODL Vault",
+                desc: "Secure BCH in time-locked smart contracts.",
+                icon: Clock,
+                link: "/workflows",
+                color: "text-rose-500"
+              },
+              {
+                title: "Trustless Escrow",
+                desc: "Security for P2P trades with multisig.",
+                icon: Landmark,
+                link: "/workflows",
+                color: "text-emerald-500"
+              },
+              {
+                title: "Minting Press",
+                desc: "Batch mint NFT collections with metadata.",
+                icon: Flame,
+                link: "/workflows",
+                color: "text-orange-500"
               }
             ].map((wf, idx) => (
               <Link href={wf.link} key={idx} className="group">
@@ -198,7 +219,7 @@ export default function Home() {
                 title: "Transaction Mixing",
                 description: "Collaborative mixing rounds to increase the anonymity set of your BCH.",
                 link: "/build/transactions",
-                icon: RefreshCcw
+                icon: RefreshCw
               },
               {
                 title: "UTXO Splitting",
