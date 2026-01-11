@@ -38,6 +38,7 @@ interface NodeConfig {
   seconds?: number
   pair?: string
   image?: string // Base64 image
+  signature?: string
 }
 
 export function NodePropertiesPanel({ selectedNode, onClose, onUpdateNode }: NodePropertiesPanelProps) {
@@ -339,6 +340,101 @@ export function NodePropertiesPanel({ selectedNode, onClose, onUpdateNode }: Nod
                 placeholder="bitcoincash:qr..."
                 className="bg-gray-800 border-gray-600 text-white"
               />
+            </div>
+          </div>
+        )
+
+      case "signMessage":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="message" className="text-white">
+                Message to Sign
+              </Label>
+              <Textarea
+                id="message"
+                value={config.message || ""}
+                onChange={(e) => setConfig({ ...config, message: e.target.value })}
+                placeholder="Enter text to sign with your private key"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+          </div>
+        )
+
+      case "verifyMessage":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="message" className="text-white">
+                Original Message
+              </Label>
+              <Textarea
+                id="message"
+                value={config.message || ""}
+                onChange={(e) => setConfig({ ...config, message: e.target.value })}
+                placeholder="The original text"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+            <div>
+              <Label htmlFor="address" className="text-white">
+                Signer Address
+              </Label>
+              <Input
+                id="address"
+                value={config.address || ""}
+                onChange={(e) => setConfig({ ...config, address: e.target.value })}
+                placeholder="bitcoincash:qr..."
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+            <div>
+              <Label htmlFor="signature" className="text-white">
+                Signature (Base64)
+              </Label>
+              <Textarea
+                id="signature"
+                value={config.signature || ""}
+                onChange={(e) => setConfig({ ...config, signature: e.target.value })}
+                placeholder="Paste the signature here"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+          </div>
+        )
+
+      case "watchAddress":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="address" className="text-white">
+                Address to Watch
+              </Label>
+              <Input
+                id="address"
+                value={config.address || ""}
+                onChange={(e) => setConfig({ ...config, address: e.target.value })}
+                placeholder="bitcoincash:qr..."
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+            <p className="text-xs text-gray-400">
+              No private key needed. This node acts as a read-only wallet.
+            </p>
+          </div>
+        )
+
+      case "generateWallet":
+        return (
+          <div className="space-y-4">
+            <div className="text-gray-400 text-sm">
+              This node will generate a fresh 12-word mnemonic and private key during execution.
+            </div>
+            <div className="p-3 bg-blue-500/10 border border-blue-500/20 rounded-lg">
+              <p className="text-xs text-blue-400 font-medium">
+                Note: The new wallet details will be printed in the terminal.
+              </p>
             </div>
           </div>
         )

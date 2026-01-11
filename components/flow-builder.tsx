@@ -37,7 +37,11 @@ import {
   PrepareWalletNode,
   ImageUploadNode,
   AssetListNode,
-  TokenHoldersNode
+  TokenHoldersNode,
+  WatchAddressNode,
+  SignMessageNode,
+  VerifyMessageNode,
+  WalletGenNode
 } from "./nodes/bch-nodes"
 import { NodePropertiesPanel } from "./node-properties-panel"
 import {
@@ -64,7 +68,12 @@ import {
   Image as ImageIcon,
   Users,
   List,
-  Monitor
+  Monitor,
+  Eye,
+  PenLine,
+  ShieldCheck,
+  Key,
+  Database
 } from "lucide-react"
 
 interface FlowBuilderProps {
@@ -80,10 +89,14 @@ interface FlowBuilderProps {
 
 const nodeData = [
   { id: "account", label: "BCH WALLET", icon: Wallet, color: "text-blue-400" },
+  { id: "watchAddress", label: "WATCH ADDRESS", icon: Eye, color: "text-slate-400" },
+  { id: "generateWallet", label: "GENERATE WALLET", icon: Key, color: "text-amber-400" },
   { id: "prepareWallet", label: "PREPARE WALLET", icon: Hammer, color: "text-orange-400" },
   { id: "payment", label: "SEND BCH", icon: Send, color: "text-green-400" },
   { id: "multiSend", label: "MULTI-SEND", icon: UserPlus, color: "text-emerald-400" },
   { id: "tokenCreate", label: "CREATE TOKEN (NFT)", icon: PlusSquare, color: "text-yellow-400" },
+  { id: "signMessage", label: "SIGN MESSAGE", icon: PenLine, color: "text-violet-400" },
+  { id: "verifyMessage", label: "VERIFY MESSAGE", icon: ShieldCheck, color: "text-emerald-400" },
   { id: "imageUpload", label: "NFT IMAGE", icon: ImageIcon, color: "text-pink-400" },
   { id: "assetList", label: "FETCH ASSETS", icon: List, color: "text-cyan-400" },
   { id: "tokenHolders", label: "TOKEN HOLDERS", icon: Users, color: "text-indigo-400" },
@@ -116,6 +129,10 @@ const nodeTypes: NodeTypes = {
   imageUpload: ImageUploadNode,
   assetList: AssetListNode,
   tokenHolders: TokenHoldersNode,
+  watchAddress: WatchAddressNode,
+  signMessage: SignMessageNode,
+  verifyMessage: VerifyMessageNode,
+  generateWallet: WalletGenNode,
 }
 
 export function FlowBuilder({

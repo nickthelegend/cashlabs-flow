@@ -100,7 +100,7 @@ export default function TransactionsPage() {
       setTerminalOutput(logs)
 
       const mainnetJs = await import("mainnet-js")
-      const { TestNetWallet } = mainnetJs
+      const { TestNetWallet, Wallet } = mainnetJs
 
       logs += "[INFO] Bitcoin Cash library loaded successfully!\n"
       setTerminalOutput(logs)
@@ -122,6 +122,20 @@ export default function TransactionsPage() {
           wallets.set(node.id, w)
           const bal: any = await w.getBalance()
           logs += `[INFO] Address: ${w.cashaddr} | Balance: ${bal.bch} BCH\n`
+          setTerminalOutput(logs)
+        }
+
+        if (node.type === 'watchAddress') {
+          const address = (node.data as any).config?.address
+          if (!address) {
+            logs += `[WARN] Watch Address node has no address. Skipping.\n`
+            continue
+          }
+          logs += `[INFO] Monitoring address: ${address}\n`
+          const w = await TestNetWallet.fromId("watchonly:" + address)
+          wallets.set(node.id, w)
+          const bal: any = await w.getBalance()
+          logs += `[INFO] Watch Balance: ${bal.bch} BCH\n`
           setTerminalOutput(logs)
         }
       }
@@ -147,6 +161,59 @@ export default function TransactionsPage() {
         const config = (node.data as any).config || {}
         const sourceNode = getSourceNode(node.id)
         const walletNode = (sourceNode && wallets.get(sourceNode.id)) || defaultWallet
+
+        if (node.type === 'generateWallet') {
+          logs += `[INFO] Generating a fresh Bitcoin Cash wallet...\n`
+          setTerminalOutput(logs)
+          try {
+            const newWallet = await TestNetWallet.newRandom()
+            logs += `[SUCCESS] Wallet Generated!\n`
+            logs += `[DATA] Address: ${newWallet.cashaddr}\n`
+            logs += `[DATA] Mnemonic: ${newWallet.mnemonic}\n`
+            logs += `[DATA] WIF: ${newWallet.privateKeyWif}\n`
+            logs += `[TIP] Copy these details and save them securely.\n`
+          } catch (e: any) {
+            logs += `[ERROR] Generation failed: ${e.message}\n`
+          }
+          setTerminalOutput(logs)
+        }
+
+        if (node.type === 'signMessage') {
+          const { message } = config
+          if (!message) continue
+          logs += `[INFO] Cryptographically signing message: "${message.substring(0, 20)}..."\n`
+          setTerminalOutput(logs)
+          try {
+            // wallet.sign in mainnet-js
+            const signature = await walletNode.sign(message)
+            logs += `[SUCCESS] Message Signed!\n`
+            logs += `[DATA] Signature: ${signature}\n`
+          } catch (e: any) {
+            logs += `[ERROR] Signing failed: ${e.message}\n`
+          }
+          setTerminalOutput(logs)
+        }
+
+        if (node.type === 'verifyMessage') {
+          const { message, address, signature } = config
+          if (!message || !address || !signature) {
+            logs += `[WARN] Verify Message node missing parameters.\n`
+            continue
+          }
+          logs += `[INFO] Verifying signature from ${address.substring(0, 15)}...\n`
+          setTerminalOutput(logs)
+          try {
+            const isValid = await walletNode.verify(message, signature)
+            if (isValid) {
+              logs += `[SUCCESS] Signature is VALID!\n`
+            } else {
+              logs += `[FAIL] Signature is INVALID/CORRUPT!\n`
+            }
+          } catch (e: any) {
+            logs += `[ERROR] Verification failed: ${e.message}\n`
+          }
+          setTerminalOutput(logs)
+        }
 
         if (node.type === 'prepareWallet') {
           logs += `[INFO] Preparing wallet for Token Genesis (creating vout=0 UTXO)...\n`
@@ -299,9 +366,9 @@ export default function TransactionsPage() {
           ]
 
           setNodes((nds) =>
-            nds.map((n) =>
+            nds.map((n: any) =>
               n.id === node.id
-                ? { ...n, data: { ...n.data, config: { ...n.data.config, holdings: currentHoldings } } }
+                ? { ...n, data: { ...n.data, config: { ...(n.data.config || {}), holdings: currentHoldings } } }
                 : n
             )
           )

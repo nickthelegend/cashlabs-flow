@@ -2,7 +2,7 @@
 
 import { memo, useRef } from "react"
 import { Handle, Position } from "@xyflow/react"
-import { Wallet, Send, Coins, FileCode, CheckCircle, Play, Snowflake, FileText, Clock, Layers, PlusSquare, Zap, TrendingUp, UserPlus, Clock3, Flame, Hammer, Image as ImageIcon, Users, List, Monitor, Upload, Download } from "lucide-react"
+import { Wallet, Send, Coins, FileCode, CheckCircle, Play, Snowflake, FileText, Clock, Layers, PlusSquare, Zap, TrendingUp, UserPlus, Clock3, Flame, Hammer, Image as ImageIcon, Users, List, Monitor, Upload, Download, Eye, PenLine, ShieldCheck, Key } from "lucide-react"
 
 const baseNodeStyle = {
   padding: "12px 16px",
@@ -121,6 +121,60 @@ export const AssetListNode = memo(({ data }: any) => (
   </div>
 ))
 AssetListNode.displayName = "AssetListNode"
+
+// Watch Address Node
+export const WatchAddressNode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(135deg, #64748b, #475569)", border: "2px solid #94a3b8" }}>
+    <Handle type="source" position={Position.Right} style={{ background: "#94a3b8", width: 10, height: 10 }} />
+    <div className="flex items-center gap-2">
+      <Eye className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">{data.label || "WATCH ADDRESS"}</span>
+    </div>
+    <div className="text-white/80 text-xs mt-1">Monitor without keys</div>
+  </div>
+))
+WatchAddressNode.displayName = "WatchAddressNode"
+
+// Sign Message Node
+export const SignMessageNode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(135deg, #8b5cf6, #6d28d9)", border: "2px solid #a78bfa" }}>
+    <Handle type="target" position={Position.Left} style={{ background: "#a78bfa", width: 10, height: 10 }} />
+    <Handle type="source" position={Position.Right} style={{ background: "#a78bfa", width: 10, height: 10 }} />
+    <div className="flex items-center gap-2">
+      <PenLine className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">{data.label || "SIGN MESSAGE"}</span>
+    </div>
+    <div className="text-white/80 text-xs mt-1">Cryptographic proof</div>
+  </div>
+))
+SignMessageNode.displayName = "SignMessageNode"
+
+// Verify Message Node
+export const VerifyMessageNode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(135deg, #10b981, #047857)", border: "2px solid #34d399" }}>
+    <Handle type="target" position={Position.Left} style={{ background: "#34d399", width: 10, height: 10 }} />
+    <Handle type="source" position={Position.Right} style={{ background: "#34d399", width: 10, height: 10 }} />
+    <div className="flex items-center gap-2">
+      <ShieldCheck className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">{data.label || "VERIFY MESSAGE"}</span>
+    </div>
+    <div className="text-white/80 text-xs mt-1">Check signature</div>
+  </div>
+))
+VerifyMessageNode.displayName = "VerifyMessageNode"
+
+// Wallet Generation Node
+export const WalletGenNode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(135deg, #f59e0b, #b45309)", border: "2px solid #fbbf24" }}>
+    <Handle type="source" position={Position.Right} style={{ background: "#fbbf24", width: 10, height: 10 }} />
+    <div className="flex items-center gap-2">
+      <Key className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">{data.label || "GENERATE WALLET"}</span>
+    </div>
+    <div className="text-white/80 text-xs mt-1">Create new seed/keys</div>
+  </div>
+))
+WalletGenNode.displayName = "WalletGenNode"
 
 // Token Holders Node
 export const TokenHoldersNode = memo(({ data }: any) => (

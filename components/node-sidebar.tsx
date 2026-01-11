@@ -25,7 +25,11 @@ import {
   Image as ImageIcon,
   Users,
   List,
-  Download
+  Download,
+  Eye,
+  PenLine,
+  ShieldCheck,
+  Key
 } from "lucide-react"
 
 interface NodeSidebarProps {
@@ -41,6 +45,25 @@ const bchNodes = [
     icon: Wallet,
     color: "text-blue-400",
     bg: "bg-blue-400/10",
+    category: "Core",
+  },
+  {
+    id: "watchAddress",
+    label: "WATCH ADDRESS",
+    description: "Monitor any address (read-only)",
+    icon: Eye,
+    color: "text-slate-400",
+    bg: "bg-slate-400/10",
+    category: "Core",
+    isNew: true,
+  },
+  {
+    id: "generateWallet",
+    label: "GENERATE WALLET",
+    description: "Create a fresh random BCH wallet",
+    icon: Key,
+    color: "text-amber-400",
+    bg: "bg-amber-400/10",
     category: "Core",
     isNew: true,
   },
@@ -119,6 +142,26 @@ const bchNodes = [
     color: "text-rose-400",
     bg: "bg-rose-400/10",
     category: "Token",
+    isNew: true,
+  },
+  {
+    id: "signMessage",
+    label: "SIGN MESSAGE",
+    description: "Sign text cryptographically with your key",
+    icon: PenLine,
+    color: "text-violet-400",
+    bg: "bg-violet-400/10",
+    category: "Utility",
+    isNew: true,
+  },
+  {
+    id: "verifyMessage",
+    label: "VERIFY MESSAGE",
+    description: "Check if a signature matches an address",
+    icon: ShieldCheck,
+    color: "text-emerald-400",
+    bg: "bg-emerald-400/10",
+    category: "Utility",
     isNew: true,
   },
   {
