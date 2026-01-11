@@ -1,0 +1,728 @@
+[
+  {
+    "type": "contract_class",
+    "message0": "Contract %1 %2 %3",
+    "args0": [
+      { "type": "field_input", "name": "NAME", "text": "MyContract" },
+      { "type": "input_dummy" },
+      { "type": "input_statement", "name": "BODY" }
+    ],
+    "colour": 230,
+    "tooltip": "Define a contract class",
+    "helpUrl": ""
+  },
+  {
+    "type": "global_state",
+    "message0": "GlobalState %1 = %2",
+    "args0": [
+      { "type": "field_input", "name": "NAME", "text": "myState" },
+      { "type": "field_dropdown", "name": "TYPE", "options": [
+        ["uint64", "uint64"],
+        ["string", "string"],
+        ["Account", "Account"],
+        ["Asset", "Asset"]
+      ]}
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 290,
+    "tooltip": "Define global state variable",
+    "helpUrl": ""
+  },
+  {
+    "type": "local_state",
+    "message0": "LocalState %1 = %2",
+    "args0": [
+      { "type": "field_input", "name": "NAME", "text": "myLocalState" },
+      { "type": "field_dropdown", "name": "TYPE", "options": [
+        ["uint64", "uint64"],
+        ["string", "string"]
+      ]}
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 290,
+    "tooltip": "Define local state variable",
+    "helpUrl": ""
+  },
+  {
+    "type": "abimethod",
+    "message0": "@abimethod %1 %2 ( %3 ) %4 %5",
+    "args0": [
+      { "type": "field_input", "name": "NAME", "text": "myMethod" },
+      { "type": "input_dummy" },
+      { "type": "input_value", "name": "PARAMS", "check": "String" },
+      { "type": "input_dummy" },
+      { "type": "input_statement", "name": "BODY" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 230,
+    "tooltip": "Define an ABI method",
+    "helpUrl": ""
+  },
+  {
+    "type": "assert",
+    "message0": "assert %1",
+    "args0": [
+      { "type": "input_value", "name": "CONDITION" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 0,
+    "tooltip": "Assert a condition",
+    "helpUrl": ""
+  },
+  {
+    "type": "log",
+    "message0": "log(%1)",
+    "args0": [
+      { "type": "input_value", "name": "MESSAGE" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 330,
+    "tooltip": "Log a message",
+    "helpUrl": ""
+  },
+  {
+    "type": "itxn_payment",
+    "message0": "itxn.payment %1 receiver: %2 amount: %3 %4 .submit()",
+    "args0": [
+      { "type": "input_dummy" },
+      { "type": "input_value", "name": "RECEIVER" },
+      { "type": "input_value", "name": "AMOUNT" },
+      { "type": "input_dummy" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 160,
+    "tooltip": "Create inner payment transaction",
+    "helpUrl": ""
+  },
+  {
+    "type": "itxn_asset_transfer",
+    "message0": "itxn.assetTransfer %1 assetReceiver: %2 xferAsset: %3 assetAmount: %4 %5 .submit()",
+    "args0": [
+      { "type": "input_dummy" },
+      { "type": "input_value", "name": "RECEIVER" },
+      { "type": "input_value", "name": "ASSET" },
+      { "type": "input_value", "name": "AMOUNT" },
+      { "type": "input_dummy" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 160,
+    "tooltip": "Create inner asset transfer transaction",
+    "helpUrl": ""
+  },
+  {
+    "type": "global_current_app_address",
+    "message0": "Global.currentApplicationAddress",
+    "output": null,
+    "colour": 290,
+    "tooltip": "Current application address",
+    "helpUrl": ""
+  },
+  {
+    "type": "global_latest_timestamp",
+    "message0": "Global.latestTimestamp",
+    "output": "Number",
+    "colour": 290,
+    "tooltip": "Latest timestamp",
+    "helpUrl": ""
+  },
+  {
+    "type": "txn_sender",
+    "message0": "Txn.sender",
+    "output": null,
+    "colour": 290,
+    "tooltip": "Transaction sender",
+    "helpUrl": ""
+  },
+  {
+    "type": "state_value",
+    "message0": "this.%1.value",
+    "args0": [
+      { "type": "field_input", "name": "STATE", "text": "myState" }
+    ],
+    "output": null,
+    "colour": 290,
+    "tooltip": "Access state value",
+    "helpUrl": ""
+  },
+  {
+    "type": "set_state_value",
+    "message0": "this.%1.value = %2",
+    "args0": [
+      { "type": "field_input", "name": "STATE", "text": "myState" },
+      { "type": "input_value", "name": "VALUE" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 290,
+    "tooltip": "Set state value",
+    "helpUrl": ""
+  },
+  {
+    "type": "text_value",
+    "message0": "\"%1\"",
+    "args0": [
+      { "type": "field_input", "name": "TEXT", "text": "" }
+    ],
+    "output": "String",
+    "colour": 160,
+    "tooltip": "Text value",
+    "helpUrl": ""
+  },
+  {
+    "type": "number_value",
+    "message0": "%1",
+    "args0": [
+      { "type": "field_number", "name": "NUM", "value": 0 }
+    ],
+    "output": "Number",
+    "colour": 230,
+    "tooltip": "Number value",
+    "helpUrl": ""
+  },
+  {
+    "type": "comparison",
+    "message0": "%1 %2 %3",
+    "args0": [
+      { "type": "input_value", "name": "A" },
+      { "type": "field_dropdown", "name": "OP", "options": [
+        ["==", "==="],
+        ["!=", "!=="],
+        [">", ">"],
+        ["<", "<"],
+        [">=", ">="],
+        ["<=", "<="]
+      ]},
+      { "type": "input_value", "name": "B" }
+    ],
+    "output": "Boolean",
+    "colour": 210,
+    "tooltip": "Compare two values",
+    "helpUrl": ""
+  },
+  {
+    "type": "param_def",
+    "message0": "%1: %2",
+    "args0": [
+      { "type": "field_input", "name": "NAME", "text": "param" },
+      { "type": "field_dropdown", "name": "TYPE", "options": [
+        ["uint64", "uint64"],
+        ["string", "string"],
+        ["Account", "Account"],
+        ["Asset", "Asset"],
+        ["gtxn.PaymentTxn", "gtxn.PaymentTxn"]
+      ]}
+    ],
+    "output": "String",
+    "colour": 230,
+    "tooltip": "Method parameter",
+    "helpUrl": ""
+  },
+  {
+    "type": "create_application",
+    "message0": "createApplication %1 params: %2 %3 %4",
+    "args0": [
+      { "type": "input_dummy" },
+      { "type": "input_value", "name": "PARAMS" },
+      { "type": "input_dummy" },
+      { "type": "input_statement", "name": "BODY" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "Create application lifecycle method",
+    "helpUrl": ""
+  },
+  {
+    "type": "update_application",
+    "message0": "updateApplication %1 %2",
+    "args0": [
+      { "type": "input_dummy" },
+      { "type": "input_statement", "name": "BODY" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "Update application lifecycle method",
+    "helpUrl": ""
+  },
+  {
+    "type": "delete_application",
+    "message0": "deleteApplication %1 %2",
+    "args0": [
+      { "type": "input_dummy" },
+      { "type": "input_statement", "name": "BODY" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "Delete application lifecycle method",
+    "helpUrl": ""
+  },
+  {
+    "type": "optin_application",
+    "message0": "optInToApplication %1 %2",
+    "args0": [
+      { "type": "input_dummy" },
+      { "type": "input_statement", "name": "BODY" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "Opt-in to application lifecycle method",
+    "helpUrl": ""
+  },
+  {
+    "type": "closeout_application",
+    "message0": "closeOutOfApplication %1 %2",
+    "args0": [
+      { "type": "input_dummy" },
+      { "type": "input_statement", "name": "BODY" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "Close out of application lifecycle method",
+    "helpUrl": ""
+  },
+  {
+    "type": "itxn_asset_create",
+    "message0": "itxn.assetConfig %1 total: %2 decimals: %3 unitName: %4 assetName: %5 %6 .submit()",
+    "args0": [
+      { "type": "input_dummy" },
+      { "type": "input_value", "name": "TOTAL" },
+      { "type": "input_value", "name": "DECIMALS" },
+      { "type": "input_value", "name": "UNIT_NAME" },
+      { "type": "input_value", "name": "ASSET_NAME" },
+      { "type": "input_dummy" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 160,
+    "tooltip": "Create asset",
+    "helpUrl": ""
+  },
+  {
+    "type": "itxn_asset_optin",
+    "message0": "itxn.assetTransfer (opt-in) %1 asset: %2 %3 .submit()",
+    "args0": [
+      { "type": "input_dummy" },
+      { "type": "input_value", "name": "ASSET" },
+      { "type": "input_dummy" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 160,
+    "tooltip": "Opt into asset",
+    "helpUrl": ""
+  },
+  {
+    "type": "itxn_asset_freeze",
+    "message0": "itxn.assetFreeze %1 freezeAccount: %2 freezeAsset: %3 frozen: %4 %5 .submit()",
+    "args0": [
+      { "type": "input_dummy" },
+      { "type": "input_value", "name": "ACCOUNT" },
+      { "type": "input_value", "name": "ASSET" },
+      { "type": "field_dropdown", "name": "FROZEN", "options": [["true", "true"], ["false", "false"]] },
+      { "type": "input_dummy" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 160,
+    "tooltip": "Freeze asset",
+    "helpUrl": ""
+  },
+  {
+    "type": "itxn_asset_revoke",
+    "message0": "itxn.assetTransfer (revoke) %1 from: %2 asset: %3 amount: %4 %5 .submit()",
+    "args0": [
+      { "type": "input_dummy" },
+      { "type": "input_value", "name": "FROM" },
+      { "type": "input_value", "name": "ASSET" },
+      { "type": "input_value", "name": "AMOUNT" },
+      { "type": "input_dummy" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 160,
+    "tooltip": "Revoke/clawback asset",
+    "helpUrl": ""
+  },
+  {
+    "type": "itxn_asset_config",
+    "message0": "itxn.assetConfig (reconfigure) %1 configAsset: %2 manager: %3 %4 .submit()",
+    "args0": [
+      { "type": "input_dummy" },
+      { "type": "input_value", "name": "ASSET" },
+      { "type": "input_value", "name": "MANAGER" },
+      { "type": "input_dummy" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 160,
+    "tooltip": "Reconfigure asset",
+    "helpUrl": ""
+  },
+  {
+    "type": "itxn_asset_delete",
+    "message0": "itxn.assetConfig (delete) %1 configAsset: %2 %3 .submit()",
+    "args0": [
+      { "type": "input_dummy" },
+      { "type": "input_value", "name": "ASSET" },
+      { "type": "input_dummy" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 160,
+    "tooltip": "Delete asset",
+    "helpUrl": ""
+  },
+  {
+    "type": "itxn_app_call",
+    "message0": "itxn.applicationCall %1 appId: %2 appArgs: %3 %4 .submit()",
+    "args0": [
+      { "type": "input_dummy" },
+      { "type": "input_value", "name": "APP_ID" },
+      { "type": "input_value", "name": "APP_ARGS" },
+      { "type": "input_dummy" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 160,
+    "tooltip": "Call another application",
+    "helpUrl": ""
+  },
+  {
+    "type": "const_declaration",
+    "message0": "const %1 = %2",
+    "args0": [
+      { "type": "field_input", "name": "NAME", "text": "myVar" },
+      { "type": "input_value", "name": "VALUE" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 330,
+    "tooltip": "Declare a constant",
+    "helpUrl": ""
+  },
+  {
+    "type": "math_operation",
+    "message0": "%1 %2 %3",
+    "args0": [
+      { "type": "input_value", "name": "A" },
+      { "type": "field_dropdown", "name": "OP", "options": [
+        ["+", "+"],
+        ["-", "-"],
+        ["*", "*"],
+        ["/", "/"],
+        ["%", "%"]
+      ]},
+      { "type": "input_value", "name": "B" }
+    ],
+    "output": "Number",
+    "colour": 230,
+    "tooltip": "Math operation",
+    "helpUrl": ""
+  },
+  {
+    "type": "if_statement",
+    "message0": "if %1 %2 %3",
+    "args0": [
+      { "type": "input_value", "name": "CONDITION", "check": "Boolean" },
+      { "type": "input_dummy" },
+      { "type": "input_statement", "name": "DO" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 210,
+    "tooltip": "If statement",
+    "helpUrl": ""
+  },
+  {
+    "type": "if_else_statement",
+    "message0": "if %1 %2 %3 else %4 %5",
+    "args0": [
+      { "type": "input_value", "name": "CONDITION", "check": "Boolean" },
+      { "type": "input_dummy" },
+      { "type": "input_statement", "name": "DO" },
+      { "type": "input_dummy" },
+      { "type": "input_statement", "name": "ELSE" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 210,
+    "tooltip": "If-else statement",
+    "helpUrl": ""
+  },
+  {
+    "type": "while_loop",
+    "message0": "while %1 %2 %3",
+    "args0": [
+      { "type": "input_value", "name": "CONDITION", "check": "Boolean" },
+      { "type": "input_dummy" },
+      { "type": "input_statement", "name": "DO" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "While loop",
+    "helpUrl": ""
+  },
+  {
+    "type": "for_loop",
+    "message0": "for %1 of %2 %3 %4",
+    "args0": [
+      { "type": "field_input", "name": "VAR", "text": "item" },
+      { "type": "input_value", "name": "LIST" },
+      { "type": "input_dummy" },
+      { "type": "input_statement", "name": "DO" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 120,
+    "tooltip": "For loop",
+    "helpUrl": ""
+  },
+  {
+    "type": "return_statement",
+    "message0": "return %1",
+    "args0": [
+      { "type": "input_value", "name": "VALUE" }
+    ],
+    "previousStatement": null,
+    "colour": 330,
+    "tooltip": "Return statement",
+    "helpUrl": ""
+  },
+  {
+    "type": "break_statement",
+    "message0": "break",
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 330,
+    "tooltip": "Break statement",
+    "helpUrl": ""
+  },
+  {
+    "type": "continue_statement",
+    "message0": "continue",
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 330,
+    "tooltip": "Continue statement",
+    "helpUrl": ""
+  },
+  {
+    "type": "logical_operation",
+    "message0": "%1 %2 %3",
+    "args0": [
+      { "type": "input_value", "name": "A", "check": "Boolean" },
+      { "type": "field_dropdown", "name": "OP", "options": [
+        ["&&", "&&"],
+        ["||", "||"],
+        ["!", "!"]
+      ]},
+      { "type": "input_value", "name": "B", "check": "Boolean" }
+    ],
+    "output": "Boolean",
+    "colour": 210,
+    "tooltip": "Logical operation",
+    "helpUrl": ""
+  },
+  {
+    "type": "box_storage",
+    "message0": "Box %1 = %2",
+    "args0": [
+      { "type": "field_input", "name": "NAME", "text": "myBox" },
+      { "type": "field_dropdown", "name": "TYPE", "options": [
+        ["string", "string"],
+        ["uint64", "uint64"],
+        ["bytes", "bytes"]
+      ]}
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 260,
+    "tooltip": "Define box storage",
+    "helpUrl": ""
+  },
+  {
+    "type": "box_map",
+    "message0": "BoxMap %1 = %2",
+    "args0": [
+      { "type": "field_input", "name": "NAME", "text": "myBoxMap" },
+      { "type": "field_dropdown", "name": "TYPE", "options": [
+        ["<Account, uint64>", "<Account, uint64>"],
+        ["<uint64, string>", "<uint64, string>"],
+        ["<string, bytes>", "<string, bytes>"]
+      ]}
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 260,
+    "tooltip": "Define box map storage",
+    "helpUrl": ""
+  },
+  {
+    "type": "box_value",
+    "message0": "this.%1.value",
+    "args0": [
+      { "type": "field_input", "name": "BOX", "text": "myBox" }
+    ],
+    "output": null,
+    "colour": 260,
+    "tooltip": "Access box value",
+    "helpUrl": ""
+  },
+  {
+    "type": "set_box_value",
+    "message0": "this.%1.value = %2",
+    "args0": [
+      { "type": "field_input", "name": "BOX", "text": "myBox" },
+      { "type": "input_value", "name": "VALUE" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 260,
+    "tooltip": "Set box value",
+    "helpUrl": ""
+  },
+  {
+    "type": "box_exists",
+    "message0": "this.%1.exists",
+    "args0": [
+      { "type": "field_input", "name": "BOX", "text": "myBox" }
+    ],
+    "output": "Boolean",
+    "colour": 260,
+    "tooltip": "Check if box exists",
+    "helpUrl": ""
+  },
+  {
+    "type": "box_delete",
+    "message0": "this.%1.delete()",
+    "args0": [
+      { "type": "field_input", "name": "BOX", "text": "myBox" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 260,
+    "tooltip": "Delete box",
+    "helpUrl": ""
+  },
+  {
+    "type": "uint64_factory",
+    "message0": "Uint64(%1)",
+    "args0": [
+      { "type": "input_value", "name": "VALUE" }
+    ],
+    "output": "Number",
+    "colour": 230,
+    "tooltip": "Create uint64 value",
+    "helpUrl": ""
+  },
+  {
+    "type": "biguint_factory",
+    "message0": "BigUint(%1)",
+    "args0": [
+      { "type": "input_value", "name": "VALUE" }
+    ],
+    "output": "Number",
+    "colour": 230,
+    "tooltip": "Create biguint value",
+    "helpUrl": ""
+  },
+  {
+    "type": "bytes_factory",
+    "message0": "Bytes(%1)",
+    "args0": [
+      { "type": "input_value", "name": "VALUE" }
+    ],
+    "output": null,
+    "colour": 160,
+    "tooltip": "Create bytes from string",
+    "helpUrl": ""
+  },
+  {
+    "type": "account_factory",
+    "message0": "Account(%1)",
+    "args0": [
+      { "type": "input_value", "name": "ADDRESS" }
+    ],
+    "output": null,
+    "colour": 290,
+    "tooltip": "Create Account from address",
+    "helpUrl": ""
+  },
+  {
+    "type": "asset_factory",
+    "message0": "Asset(%1)",
+    "args0": [
+      { "type": "input_value", "name": "ID" }
+    ],
+    "output": null,
+    "colour": 290,
+    "tooltip": "Create Asset from ID",
+    "helpUrl": ""
+  },
+  {
+    "type": "application_factory",
+    "message0": "Application(%1)",
+    "args0": [
+      { "type": "input_value", "name": "ID" }
+    ],
+    "output": null,
+    "colour": 290,
+    "tooltip": "Create Application from ID",
+    "helpUrl": ""
+  },
+  {
+    "type": "let_declaration",
+    "message0": "let %1: %2 = %3",
+    "args0": [
+      { "type": "field_input", "name": "NAME", "text": "myVar" },
+      { "type": "field_dropdown", "name": "TYPE", "options": [
+        ["uint64", "uint64"],
+        ["string", "string"],
+        ["bytes", "bytes"],
+        ["bool", "bool"]
+      ]},
+      { "type": "input_value", "name": "VALUE" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 330,
+    "tooltip": "Declare a variable",
+    "helpUrl": ""
+  },
+  {
+    "type": "variable_get",
+    "message0": "%1",
+    "args0": [
+      { "type": "field_input", "name": "VAR", "text": "myVar" }
+    ],
+    "output": null,
+    "colour": 330,
+    "tooltip": "Get variable value",
+    "helpUrl": ""
+  },
+  {
+    "type": "variable_set",
+    "message0": "%1 = %2",
+    "args0": [
+      { "type": "field_input", "name": "VAR", "text": "myVar" },
+      { "type": "input_value", "name": "VALUE" }
+    ],
+    "previousStatement": null,
+    "nextStatement": null,
+    "colour": 330,
+    "tooltip": "Set variable value",
+    "helpUrl": ""
+  }
+]
