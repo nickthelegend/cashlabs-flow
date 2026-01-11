@@ -77,7 +77,7 @@ export function ReclaimQRModal({ open, onOpenChange, walletAddress = "anonymous"
       }
 
       const ReclaimProofRequest = await loadReclaim()
-      const reclaim = ReclaimProofRequest.fromJsonString(config)
+      const reclaim = await ReclaimProofRequest.fromJsonString(config)
 
       const url = await reclaim.getRequestUrl()
       setRequestUrl(url)
@@ -148,7 +148,7 @@ export function ReclaimQRModal({ open, onOpenChange, walletAddress = "anonymous"
           <div className="w-full flex flex-col items-center justify-center p-6 bg-secondary/5 rounded-lg border-2 border-dashed border-border">
             {requestUrl ? (
               <div className="flex flex-col items-center gap-4">
-                <QRCode value={requestUrl} size={200} level="H" includeMargin={true} />
+                <QRCode value={requestUrl} size={200} level="H" />
                 <div className="text-center">
                   <p className="text-sm font-medium">Scan with your phone</p>
                   <p className="text-xs text-muted-foreground mt-1">

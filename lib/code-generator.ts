@@ -27,8 +27,8 @@ export const generateCode = (nodes: Node[], edges: Edge[]): string => {
 
   const accountNodes = nodes.filter(node => node.type === 'account');
   accountNodes.forEach(node => {
-    const wif = node.data.config.wif || storedWif || "PASTE_YOUR_WIF_HERE";
-    code += `// Wallet from node: ${node.data.label}\n`;
+    const wif = (node.data as any).config?.wif || storedWif || "PASTE_YOUR_WIF_HERE";
+    code += `// Wallet from node: ${(node.data as any).label}\n`;
     code += `const ${node.id.replace(/-/g, '_')}_wif = "${wif}";\n`;
   });
   code += '\n';
@@ -51,7 +51,8 @@ export const generateCode = (nodes: Node[], edges: Edge[]): string => {
   for (const node of sortedNodes) {
     const sourceEdges = edges.filter(edge => edge.target === node.id);
     const sourceNodes = sourceEdges.map(edge => nodes.find(n => n.id === edge.source));
-    const config = node.data.config || {};
+    const nodeData = node.data as any;
+    const config = nodeData.config || {};
     const safeId = node.id.replace(/-/g, '_');
 
     switch (node.type) {

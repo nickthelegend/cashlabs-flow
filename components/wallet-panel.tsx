@@ -58,7 +58,7 @@ export function WalletPanel({ wallet, onClose }: WalletPanelProps) {
         : await Wallet.fromWIF(wallet.privateKeyWif)
 
       const balance = await bchWallet.getBalance()
-      setRealBalance(balance.sat || 0)
+      setRealBalance((balance as any).sat || 0)
 
     } catch (error) {
       console.error("Error fetching wallet data:", error)
