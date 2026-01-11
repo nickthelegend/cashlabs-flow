@@ -8,68 +8,61 @@ interface NodeSidebarProps {
   type: "transaction"
 }
 
-const algorandNodes = [
+const bchNodes = [
   {
     id: "account",
-    label: "ACCOUNT",
-    description: "Algorand account",
+    label: "BCH WALLET",
+    description: "Bitcoin Cash wallet",
     color: "bg-blue-600",
     category: "Core",
   },
   {
     id: "payment",
-    label: "PAYMENT",
-    description: "Send ALGO",
+    label: "SEND BCH",
+    description: "Send Bitcoin Cash",
     color: "bg-green-600",
     category: "Transaction",
   },
   {
-    id: "assetTransfer",
-    label: "ASSET TRANSFER",
-    description: "Transfer ASA tokens",
-    color: "bg-purple-600",
-    category: "Transaction",
-  },
-  {
-    id: "assetCreate",
-    label: "CREATE ASSET",
-    description: "Create new ASA",
+    id: "tokenCreate",
+    label: "CREATE TOKEN",
+    description: "Create CashToken",
     color: "bg-yellow-600",
+    category: "CashTokens",
+  },
+  {
+    id: "tokenTransfer",
+    label: "TRANSFER TOKEN",
+    description: "Send CashTokens",
+    color: "bg-purple-600",
+    category: "CashTokens",
+  },
+  {
+    id: "opReturn",
+    label: "OP_RETURN",
+    description: "Store data on-chain",
+    color: "bg-orange-600",
     category: "Transaction",
   },
   {
-    id: "assetFreeze",
-    label: "FREEZE ASSET",
-    description: "Freeze/Unfreeze ASA",
-    color: "bg-teal-600",
-    category: "Transaction",
+    id: "getBalance",
+    label: "GET BALANCE",
+    description: "Check wallet balance",
+    color: "bg-cyan-600",
+    category: "Utility",
   },
   {
-    id: "keyReg",
-    label: "KEY REGISTRATION",
-    description: "Participate in consensus",
-    color: "bg-red-600",
-    category: "Transaction",
-  },
-  {
-    id: "signTxn",
-    label: "SIGN TXN",
-    description: "Sign transaction",
-    color: "bg-indigo-600",
-    category: "Transaction",
-  },
-  {
-    id: "executeTxn",
-    label: "EXECUTE TXN",
-    description: "Execute transaction",
-    color: "bg-pink-600",
-    category: "Transaction",
+    id: "waitForBalance",
+    label: "WAIT FOR BALANCE",
+    description: "Wait for funds",
+    color: "bg-violet-600",
+    category: "Utility",
   },
   {
     id: "condition",
     label: "CONDITION",
     description: "If/else logic",
-    color: "bg-cyan-600",
+    color: "bg-teal-600",
     category: "Logic",
   },
   {
@@ -81,8 +74,8 @@ const algorandNodes = [
   },
 ]
 
-const transactionNodes = algorandNodes.filter((node) =>
-  ["Core", "Transaction", "Logic", "Utility"].includes(node.category),
+const transactionNodes = bchNodes.filter((node) =>
+  ["Core", "Transaction", "CashTokens", "Logic", "Utility"].includes(node.category),
 )
 
 export function NodeSidebar({ type }: NodeSidebarProps) {
@@ -114,16 +107,16 @@ export function NodeSidebar({ type }: NodeSidebarProps) {
           </h2>
         </div>
         <p className="text-gray-400 text-sm">
-          Create and manage Algorand transactions visually
+          Create Bitcoin Cash transactions visually
         </p>
       </div>
 
       <div className="flex-1 overflow-hidden">
         <div className="p-4 border-b border-gray-700">
           <div className="flex items-center justify-between">
-            <h3 className="text-white text-sm font-semibold">Algorand Nodes</h3>
-            <Badge variant="secondary" className="text-xs">
-              Transaction
+            <h3 className="text-white text-sm font-semibold">BCH Nodes</h3>
+            <Badge variant="secondary" className="text-xs bg-green-600/20 text-green-400">
+              Bitcoin Cash
             </Badge>
           </div>
         </div>

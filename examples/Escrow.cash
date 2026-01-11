@@ -1,0 +1,11 @@
+pragma cashscript ^0.9.0;
+
+contract Escrow(pubkey buyer, pubkey seller, pubkey arbiter) {
+    function release(sig s) {
+        require(checkSig(s, buyer) || checkSig(s, arbiter));
+    }
+
+    function refund(sig s) {
+        require(checkSig(s, seller) || checkSig(s, arbiter));
+    }
+}

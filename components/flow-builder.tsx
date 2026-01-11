@@ -19,25 +19,23 @@ import { NodeSidebar } from "./node-sidebar"
 import {
   AccountNode,
   PaymentNode,
-  AssetTransferNode,
-  ApplicationCallNode,
-  AssetCreateNode,
-  KeyRegNode,
+  TokenTransferNode,
+  TokenCreateNode,
+  OpReturnNode,
+  GetBalanceNode,
+  WaitForBalanceNode,
   ConditionNode,
   OutputNode,
-  SignTxnNode,
   ExecuteTxnNode,
-  AssetFreezeNode,
-} from "./nodes/algorand-nodes"
+} from "./nodes/bch-nodes"
 import { NodePropertiesPanel } from "./node-properties-panel"
-import { Button } from "./ui/button"
 import { type Edge } from "@xyflow/react"
-// Temporary comment to force re-compilation
 
 
 interface FlowBuilderProps {
   type: "transaction"
   onFlowChange?: (nodes: Node[], edges: Edge[]) => void
+  onNodeSelect?: (node: Node | null) => void
 }
 
 const snapGrid: [number, number] = [20, 20]
@@ -46,20 +44,19 @@ const defaultViewport = { x: 0, y: 0, zoom: 1 }
 const nodeTypes: NodeTypes = {
   account: AccountNode,
   payment: PaymentNode,
-  assetTransfer: AssetTransferNode,
-  applicationCall: ApplicationCallNode,
-  assetCreate: AssetCreateNode,
-  keyReg: KeyRegNode,
+  tokenTransfer: TokenTransferNode,
+  tokenCreate: TokenCreateNode,
+  opReturn: OpReturnNode,
+  getBalance: GetBalanceNode,
+  waitForBalance: WaitForBalanceNode,
   condition: ConditionNode,
   output: OutputNode,
-  signTxn: SignTxnNode,
   executeTxn: ExecuteTxnNode,
-  assetFreeze: AssetFreezeNode,
 }
 
-export function FlowBuilder({ type, onFlowChange }: FlowBuilderProps) {
-  const [nodes, setNodes, onNodesChange] = useNodesState([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState([])
+export function FlowBuilder({ type, onFlowChange, onNodeSelect }: FlowBuilderProps) {
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null)
   const [selectedNode, setSelectedNode] = useState<Node | null>(null)
 
@@ -94,12 +91,12 @@ export function FlowBuilder({ type, onFlowChange }: FlowBuilderProps) {
 
       let config = getDefaultConfig(nodeType)
       if (nodeType === "account") {
-        const savedWallet = localStorage.getItem("algorand-wallet")
+        const savedWallet = localStorage.getItem("bch-wallet")
         if (savedWallet) {
           try {
             const parsedWallet = JSON.parse(savedWallet)
-            if (parsedWallet && parsedWallet.mnemonic) {
-              config = { ...config, mnemonic: parsedWallet.mnemonic }
+            if (parsedWallet && parsedWallet.privateKeyWif) {
+              config = { ...config, wif: parsedWallet.privateKeyWif }
             }
           } catch (error) {
             console.error("Error parsing wallet from localStorage:", error)
@@ -125,7 +122,8 @@ export function FlowBuilder({ type, onFlowChange }: FlowBuilderProps) {
 
   const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
     setSelectedNode(node)
-  }, [])
+    onNodeSelect?.(node)
+  }, [onNodeSelect])
 
   const onUpdateNode = useCallback(
     (nodeId: string, data: any) => {
@@ -134,9 +132,9 @@ export function FlowBuilder({ type, onFlowChange }: FlowBuilderProps) {
     [setNodes],
   )
 
-  
 
-  // Initialize with different example nodes based on type
+
+  // Initialize with BCH example nodes
   useEffect(() => {
     const transactionNodes: Node[] = [
       {
@@ -144,9 +142,9 @@ export function FlowBuilder({ type, onFlowChange }: FlowBuilderProps) {
         type: "account",
         position: { x: 400, y: 100 },
         data: {
-          label: "ACCOUNT",
+          label: "BCH WALLET",
           nodeType: "account",
-          config: { address: null },
+          config: { wif: null },
         },
       },
       {
@@ -154,9 +152,9 @@ export function FlowBuilder({ type, onFlowChange }: FlowBuilderProps) {
         type: "payment",
         position: { x: 650, y: 100 },
         data: {
-          label: "PAYMENT",
+          label: "SEND BCH",
           nodeType: "payment",
-          config: { amount: 1.0, receiver: null },
+          config: { amount: 0.001, receiver: null },
         },
       },
     ]
@@ -191,22 +189,24 @@ export function FlowBuilder({ type, onFlowChange }: FlowBuilderProps) {
           defaultViewport={defaultViewport}
           fitView
           style={{ background: "#000000" }}
-          connectionLineStyle={{ stroke: "#3B82F6", strokeWidth: 2 }}
-          defaultEdgeOptions={{ style: { stroke: "#3B82F6", strokeWidth: 2 }, animated: true }}
+          connectionLineStyle={{ stroke: "#22c55e", strokeWidth: 2 }}
+          defaultEdgeOptions={{ style: { stroke: "#22c55e", strokeWidth: 2 }, animated: true }}
         >
           <Controls className="bg-gray-900 border-gray-700" />
           <MiniMap
             className="bg-gray-900 border-gray-700"
             nodeStrokeColor={(n) => {
-              if (n.type === "account") return "#3B82F6"
-              if (n.type === "payment") return "#10B981"
-              if (n.type === "assetTransfer") return "#8B5CF6"
+              if (n.type === "account") return "#0ea5e9"
+              if (n.type === "payment") return "#22c55e"
+              if (n.type === "tokenTransfer") return "#a855f7"
+              if (n.type === "tokenCreate") return "#eab308"
               return "#6B7280"
             }}
             nodeColor={(n) => {
-              if (n.type === "account") return "#3B82F6"
-              if (n.type === "payment") return "#10B981"
-              if (n.type === "assetTransfer") return "#8B5CF6"
+              if (n.type === "account") return "#0ea5e9"
+              if (n.type === "payment") return "#22c55e"
+              if (n.type === "tokenTransfer") return "#a855f7"
+              if (n.type === "tokenCreate") return "#eab308"
               return "#6B7280"
             }}
             maskColor="rgba(0, 0, 0, 0.8)"
@@ -227,19 +227,16 @@ export function FlowBuilder({ type, onFlowChange }: FlowBuilderProps) {
 
 function getDefaultConfig(nodeType: string) {
   const configs: Record<string, any> = {
-    account: { address: null, mnemonic: "" },
-    payment: { amount: 1.0, receiver: null },
-    assetTransfer: { assetId: null, amount: 1, receiver: null },
-    applicationCall: { appId: null, method: "call" },
-    assetCreate: { total: 1000, decimals: 0, unitName: "TOKEN" },
-    keyReg: { online: true },
+    account: { wif: null, address: null },
+    payment: { amount: 0.001, receiver: null },
+    tokenTransfer: { tokenId: null, amount: 1, receiver: null },
+    tokenCreate: { amount: 1000000, commitment: "", capability: "none" },
+    opReturn: { message: "Hello BCH!" },
+    getBalance: {},
+    waitForBalance: { targetBalance: 0.001 },
     condition: { condition: "balance", operator: ">", value: 0 },
     output: { format: "JSON" },
-    signTxn: { method: "Private Key" },
     executeTxn: { network: "TestNet" },
-    assetFreeze: { assetId: null, freezeTarget: null, freezeState: true },
   }
   return configs[nodeType] || {}
 }
-
-

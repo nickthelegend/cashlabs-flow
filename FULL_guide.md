@@ -1,13 +1,13 @@
-# AlgoFlow - Complete Guide
+# CashLabs FLOW - Complete Guide
 
 ## Table of Contents
 
 1. [Introduction](#introduction)
 2. [Getting Started](#getting-started)
 3. [Interface Overview](#interface-overview)
-4. [Building Smart Contracts](#building-smart-contracts)
-5. [Creating Transactions](#creating-transactions)
-6. [Wallet Management](#wallet-management)
+4. [Building Smart Contracts (CashScript)](#building-smart-contracts)
+5. [Creating Transaction Flows](#creating-transactions)
+6. [Wallet Management (BCH)](#wallet-management)
 7. [Node Reference](#node-reference)
 8. [Code Generation](#code-generation)
 9. [Deployment](#deployment)
@@ -17,15 +17,15 @@
 
 ## Introduction
 
-AlgoFlow is a visual development platform for Algorand blockchain applications. It allows you to build smart contracts and transaction flows using a node-based interface, eliminating the need to write code manually.
+CashLabs FLOW is a visual development platform for Bitcoin Cash (BCH) blockchain applications. It allows you to build smart contracts using CashScript and transaction flows using a node-based interface, eliminating the need to write code manually.
 
 ### What You Can Build
 
-- Smart contracts with custom logic
-- Payment transactions
-- Asset creation and transfers
-- Application calls
-- Complex multi-step transaction flows
+- **CashScript Smart Contracts**: Custom logic for spending conditions
+- **Payment Transactions**: Basic BCH transfers
+- **CashTokens**: Create and manage fungible tokens and NFTs natively on BCH
+- **OP_RETURN Data**: Store messages or protocol data on-chain
+- **Automated Flows**: Logic that waits for balances or conditions before executing
 
 ---
 
@@ -35,8 +35,8 @@ AlgoFlow is a visual development platform for Algorand blockchain applications. 
 
 ```bash
 # Clone the repository
-git clone https://github.com/yourusername/algoflow.git
-cd algoflow
+git clone https://github.com/cashlabs-flow/flow.git
+cd cashlabs-flow
 
 # Install dependencies
 npm install
@@ -49,12 +49,12 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ### First Steps
 
-1. **Navigate to a Builder**: Choose either `/build/contracts` or `/build/transactions`
-2. **Create a Wallet**: Click the wallet button in the top-right to generate a test wallet
-3. **Add Nodes**: Drag nodes from the left sidebar onto the canvas
-4. **Connect Nodes**: Click and drag from one node's output to another's input
-5. **Configure**: Click nodes to edit their properties in the right panel
-6. **Execute**: Click "Deploy Contract" or "Run Flow" to execute your creation
+1. **Navigate to a Builder**: Choose `/build/contracts` for smart contracts or `/build/transactions` for transaction flows.
+2. **Create a Wallet**: Click the wallet button in the top-right to generate a BCH TestNet wallet.
+3. **Add Nodes**: Drag nodes from the left sidebar onto the canvas.
+4. **Connect Nodes**: Click and drag from one node's output to another's input to define execution order.
+5. **Configure**: Click nodes to edit their properties in the right panel.
+6. **Execute**: For transactions, click "Execute" in the panel or toolbar. For contracts, copy the generated CashScript code.
 
 ---
 
@@ -63,47 +63,42 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 ### Main Components
 
 #### 1. Top Bar
-- **Window Controls**: macOS-style window buttons
-- **Title**: Current page (Smart Contracts / Transactions)
-- **Wallet Button**: Create/manage wallets and toggle wallet panel
+- **BCH Branding**: Green accents and CashLabs logo.
+- **Wallet Button**: Create/manage BCH TestNet wallets and toggle the wallet panel.
 
 #### 2. Toolbar
-- **Deploy/Run Button**: Execute your flow
-- **Download Button**: Export generated code
-- **Delete Button**: Remove selected node
+- **Run/Execute Button**: Execute your transaction flow.
+- **Copy/Download**: Export the generated mainnet-js or CashScript code.
 
 #### 3. Node Sidebar (Left)
-Categorized nodes you can drag onto the canvas:
-- **Transactions**: Payment, asset transfer, app call
-- **Smart Contracts**: Contract creation, state management
-- **Logic**: Conditions, loops, variables
-- **Utilities**: Logging, delays, formatters
+Categorized nodes for BCH operations:
+- **Finance**: Send BCH, Get Balance, Wait for Balance.
+- **CashTokens**: Create Token, Transfer Token.
+- **Data**: OP_RETURN storage.
+- **Logic**: Conditions, flow control.
 
 #### 4. Canvas (Center)
-The main workspace where you build your flows:
-- **Drag nodes** from sidebar
-- **Connect nodes** by dragging from output to input ports
-- **Pan** by clicking and dragging empty space
-- **Zoom** with mouse wheel or trackpad
+The workspace for building flows:
+- **Drag & Drop** nodes from sidebar.
+- **Connect ports** to define logic flow.
+- **Green connections** signify the path of execution.
 
 #### 5. Properties Panel (Right)
 Appears when you select a node:
-- Edit node parameters
-- Configure inputs/outputs
-- View node documentation
+- Edit BCH addresses, amounts (in BCH or Satoshis), and token IDs.
+- Configure private keys (WIF) for signing.
 
 #### 6. Wallet Panel (Right, toggleable)
-- View wallet address and balance
-- See transaction history
-- Copy wallet details
-- Monitor ALGO price
+- View **BCH Address** and **Balance**.
+- Switch between networks (TestNet/ChipNet).
+- Send quick payments manually.
+- Monitor BCH/USD price.
 
 #### 7. Terminal (Bottom)
-Shows execution logs:
-- Connection status
-- Transaction details
-- Errors and warnings
-- Execution results
+Shows implementation logs:
+- Transaction IDs (clickable to explorer).
+- Execution steps and status.
+- Contract compilation results.
 
 ---
 
@@ -111,98 +106,51 @@ Shows execution logs:
 
 ### Contract Builder (`/build/contracts`)
 
-#### Step 1: Add Contract Node
+We offer two modes for building CashScript contracts:
 
-Drag a "Create Application" node onto the canvas. This is the foundation of your smart contract.
+#### 1. Easy Mode (Noob)
+Simplified blocks for common patterns:
+- Signature checks
+- Simple transfers
+- Time-locks
 
-**Configuration:**
-- **Approval Program**: The main contract logic
-- **Clear Program**: Cleanup logic when users opt out
-- **Global State**: Contract-wide storage
-- **Local State**: Per-user storage
-
-#### Step 2: Add Logic Nodes
-
-Build your contract logic using:
-- **Condition nodes**: If/else logic
-- **State nodes**: Read/write to storage
-- **Transaction nodes**: Handle payments, transfers
-
-#### Step 3: Connect Flow
-
-Link nodes in execution order. The flow determines how your contract processes transactions.
-
-#### Example: Simple Counter Contract
-
-```
-[Start] → [Create Application] → [Increment Counter] → [Store State] → [End]
-```
-
-1. Drag "Create Application" node
-2. Set global state schema: `counter: uint64`
-3. Add "Increment" logic node
-4. Connect to "Store State" node
-5. Deploy to TestNet
+#### 2. Pro Mode
+Full access to the CashScript language:
+- **Introspection**: Access `tx.inputs`, `tx.outputs`, etc.
+- **Hashing**: `sha256`, `hash160`, `ripemd160`.
+- **Locking Scripts**: Generate P2PKH or P2SH bytecode.
+- **Complex Logic**: Multi-sig and covenant support.
 
 ---
 
-## Creating Transactions
+## Creating Transaction Flows
 
 ### Transaction Builder (`/build/transactions`)
 
 #### Payment Transaction
+1. Drag a **Send BCH** node.
+2. Set the **Receiver** address.
+3. Specify the **Amount** in BCH.
+4. Connect to execution start.
 
-1. Drag "Payment Transaction" node
-2. Configure:
-   - **Receiver**: Destination address
-   - **Amount**: ALGO amount (in microAlgos)
-   - **Note**: Optional transaction note
-3. Connect to execution flow
-4. Run
+#### CashToken Operations
+1. **Token Create**: Genesis a new token category with fungible supply or an NFT.
+2. **Token Transfer**: Send existing tokens to a new owner (requires Token ID).
 
-#### Asset Transfer
-
-1. Drag "Asset Transfer" node
-2. Set:
-   - **Asset ID**: The asset to transfer
-   - **Receiver**: Destination address
-   - **Amount**: Number of units
-3. Execute
-
-#### Application Call
-
-1. Drag "App Call" node
-2. Configure:
-   - **App ID**: Target application
-   - **Method**: Function to call
-   - **Arguments**: Method parameters
-3. Run transaction
+#### Logic Utilities
+- **Wait for Balance**: Pauses execution until the wallet receives a specific amount.
+- **Condition**: Branches the flow based on balance or other data.
 
 ---
 
 ## Wallet Management
 
 ### Creating a Wallet
+1. Click the wallet button.
+2. Select **Create BCH Wallet**.
+3. A random TestNet wallet is created and saved to your browser's local storage.
 
-1. Click the wallet button (top-right)
-2. Select "Create New Wallet"
-3. Your wallet is generated with:
-   - Address
-   - Private key (stored locally)
-   - Mnemonic phrase
-
-**⚠️ Important**: This is a development wallet. Never use it for real funds.
-
-### Wallet Panel Features
-
-- **Address**: Click to copy
-- **Balance**: Real-time ALGO balance
-- **Transactions**: View transaction history
-- **Price**: Current ALGO/USD rate
-
-### Toggle Wallet Panel
-
-Click the wallet button to show/hide the panel. The panel starts hidden by default.
+**⚠️ Warning**: These wallets are for development use. Do not use them for large MainNet funds unless you have exported and secured the private key (WIF).
 
 ---
 
@@ -210,229 +158,64 @@ Click the wallet button to show/hide the panel. The panel starts hidden by defau
 
 ### Transaction Nodes
 
-#### Payment Transaction
-Sends ALGO from one account to another.
+#### Send BCH
+Sends Bitcoin Cash to a recipient.
+- **Input**: Receiver (CashAddr), Amount (BCH).
+- **Execution**: Signs and broadcasts via mainnet-js.
 
-**Inputs:**
-- `receiver` (string): Destination address
-- `amount` (number): Amount in microAlgos
-- `note` (string, optional): Transaction note
+#### OP_RETURN
+Stores text or hex data on the blockchain.
+- **Input**: Message/Data.
+- **Cost**: Nominal fee (satoshi) + dust.
 
-**Outputs:**
-- `txnId` (string): Transaction ID
-
-#### Asset Transfer
-Transfers Algorand Standard Assets (ASAs).
-
-**Inputs:**
-- `assetId` (number): Asset ID
-- `receiver` (string): Destination address
-- `amount` (number): Asset units
-
-**Outputs:**
-- `txnId` (string): Transaction ID
-
-#### Application Call
-Calls a smart contract method.
-
-**Inputs:**
-- `appId` (number): Application ID
-- `method` (string): Method name
-- `args` (array): Method arguments
-
-**Outputs:**
-- `result` (any): Method return value
-
-### Smart Contract Nodes
-
-#### Create Application
-Deploys a new smart contract.
-
-**Inputs:**
-- `approvalProgram` (string): TEAL code
-- `clearProgram` (string): Clear TEAL code
-- `globalSchema` (object): Global state schema
-- `localSchema` (object): Local state schema
-
-**Outputs:**
-- `appId` (number): Created application ID
-
-#### Update Application
-Updates existing contract code.
-
-**Inputs:**
-- `appId` (number): Application to update
-- `approvalProgram` (string): New TEAL code
-
-**Outputs:**
-- `success` (boolean): Update status
-
-#### Delete Application
-Removes a smart contract.
-
-**Inputs:**
-- `appId` (number): Application to delete
-
-**Outputs:**
-- `success` (boolean): Deletion status
-
-### Logic Nodes
-
-#### Condition
-Branches execution based on a condition.
-
-**Inputs:**
-- `condition` (boolean): Condition to evaluate
-- `trueFlow` (connection): Execute if true
-- `falseFlow` (connection): Execute if false
-
-#### Variable
-Stores and retrieves values.
-
-**Inputs:**
-- `name` (string): Variable name
-- `value` (any): Value to store
-
-**Outputs:**
-- `value` (any): Stored value
+#### Token Create
+Creating a new CashToken.
+- **Type**: Fungible or NFT.
+- **Optional**: Capability (Minting, Mutable, None).
 
 ---
 
 ## Code Generation
 
-AlgoFlow automatically generates JavaScript code from your visual flows.
+CashLabs FLOW generates **Mainnet-js** (JavaScript) for transaction flows and **CashScript** for smart contracts.
 
-### How It Works
+### Example Generated Contract
+```cashscript
+pragma cashscript ^0.9.0;
 
-1. **Parse Flow**: Analyzes nodes and connections
-2. **Build AST**: Creates abstract syntax tree
-3. **Generate Code**: Converts to JavaScript
-4. **Optimize**: Removes redundant code
-
-### Generated Code Structure
-
-```javascript
-import algosdk from 'algosdk';
-
-// Initialize Algorand client
-const algodClient = new algosdk.Algodv2(token, server, port);
-
-// Get transaction parameters
-const params = await algodClient.getTransactionParams().do();
-
-// Your flow logic
-// ... generated code ...
-
-// Sign and send transaction
-const signedTxn = txn.signTxn(privateKey);
-await algodClient.sendRawTransaction(signedTxn).do();
+contract P2PKH(pubkey pk) {
+    function spend(sig s) {
+        require(checkSig(s, pk));
+    }
+}
 ```
 
-### Exporting Code
-
-Click the download button to export your generated code as a `.js` file. You can run it independently with Node.js.
+### Example Generated Execution
+```javascript
+const wallet = await TestNetWallet.fromWIF(myWif);
+await wallet.send([
+  { cashaddr: "bitcoincash:qr...", value: 0.01, unit: "bch" }
+]);
+```
 
 ---
 
 ## Deployment
 
-### TestNet Deployment
-
-1. **Build Your Flow**: Create your contract or transaction flow
-2. **Connect Wallet**: Ensure you have a wallet connected
-3. **Fund Wallet**: Get TestNet ALGO from [dispenser](https://bank.testnet.algorand.network/)
-4. **Deploy**: Click "Deploy Contract" or "Run Flow"
-5. **Monitor**: Watch the terminal for deployment status
-
-### Execution Flow
-
-```
-[Build Flow] → [Generate Code] → [Connect to TestNet] 
-→ [Sign Transaction] → [Submit] → [Confirm] → [Success]
-```
-
-### Troubleshooting
-
-**Error: Insufficient Balance**
-- Fund your wallet with TestNet ALGO
-
-**Error: Invalid Transaction**
-- Check node configurations
-- Verify all required fields are filled
-
-**Error: Network Timeout**
-- Check internet connection
-- Try again in a few moments
+1. **Get TestNet Coins**: Use the Faucet link in the Wallet Panel.
+2. **Build Flow**: Connect your nodes.
+3. **Run**: Click the Execute button.
+4. **Verify**: Click the Transaction ID in the terminal to view on the TestNet Explorer.
 
 ---
 
 ## Best Practices
 
-### Smart Contract Development
-
-1. **Start Simple**: Begin with basic contracts, add complexity gradually
-2. **Test Thoroughly**: Use TestNet before MainNet
-3. **Handle Errors**: Add error handling nodes
-4. **Optimize State**: Minimize global/local state usage
-5. **Document**: Add notes to complex flows
-
-### Transaction Flows
-
-1. **Validate Inputs**: Check addresses and amounts
-2. **Use Notes**: Add transaction notes for tracking
-3. **Batch Operations**: Group related transactions
-4. **Monitor Gas**: Be aware of transaction fees
-5. **Confirm Success**: Always check transaction status
-
-### Security
-
-1. **Never Share Private Keys**: Keep mnemonics secure
-2. **Test Wallets Only**: Don't use real funds in development
-3. **Validate Addresses**: Double-check recipient addresses
-4. **Review Generated Code**: Inspect before deployment
-5. **Use TestNet First**: Always test on TestNet
-
-### Performance
-
-1. **Minimize Nodes**: Use fewer nodes when possible
-2. **Optimize Connections**: Avoid unnecessary links
-3. **Cache Results**: Store frequently used values
-4. **Batch Transactions**: Group when applicable
-5. **Monitor Execution**: Watch terminal for bottlenecks
+1. **Use ChipNet**: For the latest CashToken features, ensure you are on a ChipNet-compatible network.
+2. **Introspection**: When building contracts, use introspection (tx.outputs) for advanced covenants.
+3. **Fees**: BCH fees are extremely low; usually 1 sat/byte is sufficient.
+4. **Security**: Validate all addresses before sending. Use the "Simulate" feature to preview execution without spending real coins.
 
 ---
 
-## Advanced Topics
-
-### Custom Nodes
-
-You can extend AlgoFlow with custom nodes by editing `components/nodes/algorand-nodes.tsx`.
-
-### Integration
-
-Export generated code and integrate into your applications:
-
-```javascript
-import { executeFlow } from './generated-flow.js';
-
-// Use in your app
-await executeFlow(params);
-```
-
-### API Usage
-
-AlgoFlow uses the Algorand JavaScript SDK. Reference the [official docs](https://developer.algorand.org/docs/sdks/javascript/) for advanced usage.
-
----
-
-## Support & Resources
-
-- **Algorand Developer Portal**: https://developer.algorand.org/
-- **AlgoFlow Issues**: GitHub Issues
-- **Community**: Algorand Discord
-
----
-
-## License
-
-MIT License - See LICENSE file for details.
+Built for the Bitcoin Cash ecosystem. ₿

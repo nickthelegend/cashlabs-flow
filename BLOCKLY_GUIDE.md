@@ -1,66 +1,66 @@
-# Blockly Visual Contract Builder Guide
+# Blockly Visual CashScript Builder Guide
 
 ## Overview
 
-The Blockly-based visual contract builder is located at `/build/contracts` and provides a drag-and-drop interface for building Algorand smart contracts.
+The Blockly-based visual contract builder is located at `/build/contracts` and provides a drag-and-drop interface for building Bitcoin Cash (BCH) smart contracts using CashScript.
 
 ## Architecture
 
 ### Components
 
-1. **BlockPicker.tsx** - Left column toolbox that loads and displays available blocks
-2. **BlockWorkspace.tsx** - Center workspace where users drag and drop blocks
-3. **CodePreview.tsx** - Right column showing generated TypeScript/JavaScript code
+1. **BlockPicker.tsx** - Left column toolbox that loads and displays available blocks. Defines the code generators for CashScript.
+2. **BlockPickerNoob.tsx** - Simplified version of the BlockPicker for beginners.
+3. **BlockWorkspace.tsx** - Center workspace where users drag and drop blocks.
+4. **CodePreview.tsx** - Right column showing generated CashScript code.
 
 ### File Structure
 
 ```
 components/
-├── BlockPicker.tsx       # Toolbox component
-├── BlockWorkspace.tsx    # Main workspace component
-└── CodePreview.tsx       # Code preview component
+├── BlockPicker.tsx       # Pro Mode Toolbox & Generators
+├── BlockPickerNoob.tsx   # Easy Mode Toolbox & Generators
+├── BlockWorkspace.tsx    # Main React Blockly workspace
+└── CodePreview.tsx       # Code preview and export tools
 
 app/build/contracts/
-└── page.tsx              # Main page wiring components together
-
-public/examples/
-└── blocks.json           # Block definitions
+├── page.tsx              # Pro Mode page
+└── noob/page.tsx         # Easy Mode page
 
 examples/
-└── blocks.json           # Source block definitions
+└── blocks.json           # Block definitions (shared)
 ```
 
 ## Adding New Blocks
 
 ### Step 1: Define Block in JSON
 
-Edit `examples/blocks.json` (or `public/examples/blocks.json`) and add your block definition:
+Edit `examples/blocks.json` and add your block definition:
 
 ```json
 {
-  "type": "my_new_block",
-  "message0": "My Block %1 input %2",
+  "type": "bch_checksig",
+  "message0": "Verify Signature %1 for PubKey %2",
   "args0": [
-    { "type": "input_dummy" },
-    { "type": "input_value", "name": "INPUT", "check": "String" }
+    { "type": "input_value", "name": "SIG", "check": "Signature" },
+    { "type": "input_value", "name": "PUBKEY", "check": "PubKey" }
   ],
   "previousStatement": null,
   "nextStatement": null,
-  "colour": 230,
-  "tooltip": "Description of what this block does",
+  "colour": 120,
+  "tooltip": "Enforce signature verification",
   "helpUrl": ""
 }
 ```
 
-### Step 2: Register Code Generator
+### Step 2: Register CashScript Generator
 
-Edit `components/BlockPicker.tsx` and add a generator function:
+Edit `components/BlockPicker.tsx` and add a generator function to the `useEffect`:
 
 ```typescript
-// Add this in the useEffect where other generators are defined
-javascriptGenerator.forBlock["my_new_block"] = function(block: any) {
-  const input = javascriptGenerator.valueToCode(block, "INPUT", Order.ATOMIC) || '""'
-  const code = `// My New Block\nawait myNewFunction(${input});\n`
+javascriptGenerator.forBlock["bch_checksig"] = function(block: any) {
+  const sig = javascriptGenerator.valueToCode(block, "SIG", Order.ATOMIC) || "s"
+  const pubkey = javascriptGenerator.valueToCode(block, "PUBKEY", Order.ATOMIC) || "pk"
+  const code = `require(checkSig(${sig}, ${pubkey}));\n`
   return code
 }
 ```
@@ -72,155 +72,43 @@ In `components/BlockPicker.tsx`, add your block to a category:
 ```typescript
 const categories = [
   {
-    name: "Core",
-    colour: "230",
-    blocks: ["app_create", "app_call", "my_new_block"] // Add here
-  },
-  // ... other categories
+    name: "Verification",
+    colour: "120",
+    blocks: ["bch_checksig", "bch_checkdatasig"]
+  }
 ]
 ```
 
-### Step 4: Copy to Public Folder
+## Generated Code
 
-```bash
-copy examples\blocks.json public\examples\blocks.json
-```
+The builder generates `.cash` files compatible with the CashScript compiler.
 
-## Block Types
-
-### Statement Blocks
-Blocks that execute actions (have previous/next connections):
-```json
-{
-  "previousStatement": null,
-  "nextStatement": null
-}
-```
-
-### Value Blocks
-Blocks that return values (have output):
-```json
-{
-  "output": "String"  // or "Number", null for any type
-}
-```
-
-### Input Types
-
-- `input_dummy` - No input, just a label
-- `input_value` - Accepts another block as input
-- `field_input` - Text input field
-- `field_number` - Number input field
-- `field_dropdown` - Dropdown selection
-
-## Example: Creating a Custom Block
-
-### 1. Define the Block
-
-```json
-{
-  "type": "send_asset",
-  "message0": "Send Asset %1 to %2 amount %3",
-  "args0": [
-    { "type": "input_value", "name": "ASSET_ID", "check": "Number" },
-    { "type": "input_value", "name": "RECEIVER", "check": "String" },
-    { "type": "input_value", "name": "AMOUNT", "check": "Number" }
-  ],
-  "previousStatement": null,
-  "nextStatement": null,
-  "colour": 160,
-  "tooltip": "Send an asset to an address",
-  "helpUrl": ""
-}
-```
-
-### 2. Add Generator
-
-```typescript
-javascriptGenerator.forBlock["send_asset"] = function(block: any) {
-  const assetId = javascriptGenerator.valueToCode(block, "ASSET_ID", Order.ATOMIC) || "0"
-  const receiver = javascriptGenerator.valueToCode(block, "RECEIVER", Order.ATOMIC) || '""'
-  const amount = javascriptGenerator.valueToCode(block, "AMOUNT", Order.ATOMIC) || "0"
-  
-  const code = `
-// Send Asset Transaction
-const assetTransferTxn = algosdk.makeAssetTransferTxnWithSuggestedParamsFromObject({
-  from: senderAddress,
-  to: ${receiver},
-  assetIndex: ${assetId},
-  amount: ${amount},
-  suggestedParams: params
-});
-await algodClient.sendRawTransaction(assetTransferTxn.toByte()).do();
-`
-  return code
+Example output:
+```cashscript
+contract MyContract(pubkey pk) {
+    function spend(sig s) {
+        require(checkSig(s, pk));
+    }
 }
 ```
 
 ## Features
 
 ### Persistence
-- Workspace automatically saves to localStorage under `vcontract:workspace`
-- Workspace is restored on page reload
+- Workspace automatically saves to localStorage under `vcontract:workspace`.
+- Syncs between mode switches (mostly compatible).
 
 ### Export/Import
-- Export generated code as `.js` file
-- Export workspace as `.xml` file for sharing/backup
-- Copy code to clipboard
+- Export generated code as `.cash` file.
+- Export workspace as `.xml` file for sharing.
+- "Open in Playground" sends you to the official CashScript playground.
 
-### Mouse Wheel Behavior
-- Mouse wheel scrolls/pans the workspace (does not zoom)
-- Use zoom controls in the workspace for zooming
+## Best Practices
 
-### Dark Theme
-- Custom dark theme applied to workspace
-- Black background (#0b0b0b)
-- Readable block colors
+1. **Parameter Sync**: Ensure parameters defined in the "Contract Definition" block match the arguments used in logic blocks.
+2. **Introspection**: Use the Introspection category for covenant logic (checking transaction outputs).
+3. **Types**: CashScript is strictly typed. Ensure signatures and public keys are connected to correct ports.
 
-## Troubleshooting
+---
 
-### Blocks not appearing
-1. Check browser console for errors
-2. Verify `blocks.json` is in `public/examples/` folder
-3. Ensure block definitions are valid JSON
-
-### Code not generating
-1. Check that generator is registered in `BlockPicker.tsx`
-2. Verify block type matches between JSON and generator
-3. Check browser console for generator errors
-
-### SSR Errors
-- `BlockWorkspace` uses dynamic import with `ssr: false`
-- Blockly is only loaded client-side in `useEffect`
-
-## Commands
-
-```bash
-# Development
-npm run dev
-
-# Build
-npm run build
-
-# Start production
-npm start
-```
-
-## Files Changed
-
-1. `app/build/contracts/page.tsx` - Main page component
-2. `components/BlockPicker.tsx` - New component
-3. `components/BlockWorkspace.tsx` - New component
-4. `components/CodePreview.tsx` - New component
-5. `examples/blocks.json` - New block definitions
-6. `public/examples/blocks.json` - Public block definitions
-7. `app/globals.css` - Removed commented CSS imports
-8. `package.json` - Added blockly dependency
-
-## Next Steps
-
-1. Add more Algorand-specific blocks (asset operations, state management, etc.)
-2. Implement full TypeScript contract generation
-3. Add block validation and error checking
-4. Create block templates for common patterns
-5. Add import workspace XML functionality
+Built for Bitcoin Cash. ₿

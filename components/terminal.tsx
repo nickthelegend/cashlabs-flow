@@ -15,29 +15,19 @@ interface TerminalProps {
 
 export function Terminal({ isOpen, onClose }: TerminalProps) {
   const [output] = useState([
-    "AlgoFLOW Terminal v1.0.0",
-    "Ready to compile and deploy your Algorand applications",
+    "CashLabs FLOW Terminal v1.0.0",
+    "Ready to compile and deploy your Bitcoin Cash smart contracts",
+    "BCH TestNet active",
     "",
     "> Waiting for input...",
   ])
 
-  const [code] = useState(`// Generated Smart Contract
-import { Contract } from '@algorandfoundation/tealscript';
+  const [code] = useState(`pragma cashscript ^0.9.0;
 
-class AlgoFlowContract extends Contract {
-  value = GlobalStateKey<uint64>();
-  
-  setValue(newValue: uint64): void {
-    this.value.value = newValue;
-  }
-  
-  getValue(): uint64 {
-    return this.value.value;
-  }
-  
-  createApplication(): void {
-    this.value.value = 0;
-  }
+contract CashTransfer(pubkey pk) {
+    function spend(sig s) {
+        require(checkSig(s, pk));
+    }
 }`)
 
   const [copied, setCopied] = useState(false)
@@ -48,7 +38,7 @@ class AlgoFlowContract extends Contract {
       setCopied(true)
       toast({
         title: "Code Copied",
-        description: "Code has been copied to clipboard",
+        description: "CashScript code has been copied to clipboard",
         duration: 2000,
       })
       setTimeout(() => setCopied(false), 2000)
@@ -64,12 +54,12 @@ class AlgoFlowContract extends Contract {
   if (!isOpen) return null
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 h-80 bg-gray-900/98 backdrop-blur-lg border-t border-gray-700 z-40">
+    <div className="fixed bottom-0 left-0 right-0 h-80 bg-[#0a0a0a]/98 backdrop-blur-lg border-t border-green-500/30 z-40">
       <Card className="w-full h-full bg-transparent border-none rounded-none">
-        <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b border-gray-700">
+        <CardHeader className="flex flex-row items-center justify-between py-3 px-4 border-b border-gray-800">
           <CardTitle className="text-white flex items-center text-sm">
-            <TerminalIcon className="h-4 w-4 mr-2" />
-            Terminal
+            <TerminalIcon className="h-4 w-4 mr-2 text-green-500" />
+            BCH Console
           </CardTitle>
           <Button variant="ghost" size="sm" onClick={onClose} className="text-gray-400 hover:text-white">
             <X className="h-4 w-4" />
@@ -77,13 +67,13 @@ class AlgoFlowContract extends Contract {
         </CardHeader>
         <CardContent className="p-0 h-[calc(100%-4rem)]">
           <Tabs defaultValue="output" className="h-full">
-            <div className="flex items-center justify-between px-4 py-2 bg-gray-800/50 border-b border-gray-700">
-              <TabsList className="bg-gray-800/50 border border-gray-600">
-                <TabsTrigger value="output" className="text-xs">
+            <div className="flex items-center justify-between px-4 py-2 bg-[#111] border-b border-gray-800">
+              <TabsList className="bg-gray-900 border border-gray-800">
+                <TabsTrigger value="output" className="text-xs data-[state=active]:bg-green-600/20 data-[state=active]:text-green-400">
                   Output
                 </TabsTrigger>
-                <TabsTrigger value="code" className="text-xs">
-                  Code
+                <TabsTrigger value="code" className="text-xs data-[state=active]:bg-green-600/20 data-[state=active]:text-green-400">
+                  CashScript
                 </TabsTrigger>
               </TabsList>
               <Button
@@ -93,7 +83,7 @@ class AlgoFlowContract extends Contract {
                 className="text-gray-400 hover:text-white"
                 disabled={copied}
               >
-                {copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                 <span className="ml-1 text-xs">{copied ? "Copied" : "Copy"}</span>
               </Button>
             </div>
@@ -109,7 +99,7 @@ class AlgoFlowContract extends Contract {
             </TabsContent>
 
             <TabsContent value="code" className="h-[calc(100%-3rem)] m-0">
-              <div className="h-full bg-gray-950">
+              <div className="h-full bg-black">
                 <MonacoEditor code={code} />
               </div>
             </TabsContent>
@@ -123,14 +113,14 @@ class AlgoFlowContract extends Contract {
 function MonacoEditor({ code }: { code: string }) {
   return (
     <div className="h-full w-full relative">
-      <div className="absolute inset-0 bg-gray-950">
-        <pre className="h-full w-full p-4 text-sm text-gray-300 font-mono overflow-auto bg-gray-950 border-none outline-none resize-none">
+      <div className="absolute inset-0 bg-black">
+        <pre className="h-full w-full p-4 text-sm text-gray-300 font-mono overflow-auto bg-black border-none outline-none resize-none">
           <code className="language-typescript">{code}</code>
         </pre>
       </div>
       <style jsx>{`
         pre {
-          background: #0a0a0a !important;
+          background: #000 !important;
           color: #e5e7eb;
           font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
           font-size: 13px;

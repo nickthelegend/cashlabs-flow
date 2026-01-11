@@ -1,0 +1,7 @@
+pragma cashscript ^0.9.0;
+
+contract P2PKH(pubkey pk) {
+    function spend(sig s) {
+        require(checkSig(s, pk));
+    }
+}

@@ -17,8 +17,25 @@ interface NodePropertiesPanelProps {
   onUpdateNode: (nodeId: string, data: any) => void
 }
 
+interface NodeConfig {
+  address?: string
+  wif?: string
+  amount?: number
+  receiver?: string
+  tokenId?: string
+  commitment?: string
+  capability?: string
+  message?: string
+  unit?: string
+  targetBalance?: number
+  condition?: string
+  operator?: string
+  value?: string
+  format?: string
+}
+
 export function NodePropertiesPanel({ selectedNode, onClose, onUpdateNode }: NodePropertiesPanelProps) {
-  const [config, setConfig] = useState(selectedNode?.data?.config || {})
+  const [config, setConfig] = useState<NodeConfig>(selectedNode?.data?.config || {})
 
   if (!selectedNode) return null
 
@@ -37,27 +54,31 @@ export function NodePropertiesPanel({ selectedNode, onClose, onUpdateNode }: Nod
           <div className="space-y-4">
             <div>
               <Label htmlFor="address" className="text-white">
-                Account Address
+                BCH Address (CashAddr)
               </Label>
               <Input
                 id="address"
                 value={config.address || ""}
                 onChange={(e) => setConfig({ ...config, address: e.target.value })}
-                placeholder="Enter Algorand address"
+                placeholder="bitcoincash:qr..."
                 className="bg-gray-800 border-gray-600 text-white"
               />
             </div>
             <div>
-              <Label htmlFor="mnemonic" className="text-white">
-                Mnemonic (Optional)
+              <Label htmlFor="wif" className="text-white">
+                Private Key (WIF)
               </Label>
-              <Textarea
-                id="mnemonic"
-                value={config.mnemonic || ""}
-                onChange={(e) => setConfig({ ...config, mnemonic: e.target.value })}
-                placeholder="Enter 25-word mnemonic phrase"
+              <Input
+                id="wif"
+                type="password"
+                value={config.wif || ""}
+                onChange={(e) => setConfig({ ...config, wif: e.target.value })}
+                placeholder="Enter WIF private key"
                 className="bg-gray-800 border-gray-600 text-white"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Keep this secret! Used for signing transactions.
+              </p>
             </div>
           </div>
         )
@@ -67,14 +88,15 @@ export function NodePropertiesPanel({ selectedNode, onClose, onUpdateNode }: Nod
           <div className="space-y-4">
             <div>
               <Label htmlFor="amount" className="text-white">
-                Amount (ALGO)
+                Amount (BCH)
               </Label>
               <Input
                 id="amount"
                 type="number"
+                step="0.00000001"
                 value={config.amount || ""}
                 onChange={(e) => setConfig({ ...config, amount: Number.parseFloat(e.target.value) })}
-                placeholder="0.0"
+                placeholder="0.001"
                 className="bg-gray-800 border-gray-600 text-white"
               />
             </div>
@@ -86,38 +108,25 @@ export function NodePropertiesPanel({ selectedNode, onClose, onUpdateNode }: Nod
                 id="receiver"
                 value={config.receiver || ""}
                 onChange={(e) => setConfig({ ...config, receiver: e.target.value })}
-                placeholder="Enter receiver address"
-                className="bg-gray-800 border-gray-600 text-white"
-              />
-            </div>
-            <div>
-              <Label htmlFor="note" className="text-white">
-                Note (Optional)
-              </Label>
-              <Input
-                id="note"
-                value={config.note || ""}
-                onChange={(e) => setConfig({ ...config, note: e.target.value })}
-                placeholder="Transaction note"
+                placeholder="bitcoincash:qr... or bchtest:qr..."
                 className="bg-gray-800 border-gray-600 text-white"
               />
             </div>
           </div>
         )
 
-      case "assetTransfer":
+      case "tokenTransfer":
         return (
           <div className="space-y-4">
             <div>
-              <Label htmlFor="assetId" className="text-white">
-                Asset ID
+              <Label htmlFor="tokenId" className="text-white">
+                Token ID (Category)
               </Label>
               <Input
-                id="assetId"
-                type="number"
-                value={config.assetId || ""}
-                onChange={(e) => setConfig({ ...config, assetId: Number.parseInt(e.target.value) })}
-                placeholder="Enter Asset ID"
+                id="tokenId"
+                value={config.tokenId || ""}
+                onChange={(e) => setConfig({ ...config, tokenId: e.target.value })}
+                placeholder="Enter CashToken category ID"
                 className="bg-gray-800 border-gray-600 text-white"
               />
             </div>
@@ -130,129 +139,141 @@ export function NodePropertiesPanel({ selectedNode, onClose, onUpdateNode }: Nod
                 type="number"
                 value={config.amount || ""}
                 onChange={(e) => setConfig({ ...config, amount: Number.parseInt(e.target.value) })}
-                placeholder="0"
+                placeholder="1"
                 className="bg-gray-800 border-gray-600 text-white"
               />
             </div>
             <div>
               <Label htmlFor="receiver" className="text-white">
-                Receiver Address
+                Receiver Address (Token Address)
               </Label>
               <Input
                 id="receiver"
                 value={config.receiver || ""}
                 onChange={(e) => setConfig({ ...config, receiver: e.target.value })}
-                placeholder="Enter receiver address"
+                placeholder="bitcoincash:zr..."
                 className="bg-gray-800 border-gray-600 text-white"
               />
             </div>
           </div>
         )
 
-      case "assetCreate":
+      case "tokenCreate":
         return (
           <div className="space-y-4">
             <div>
-              <Label htmlFor="total" className="text-white">
-                Total Supply
+              <Label htmlFor="amount" className="text-white">
+                Fungible Token Amount
               </Label>
               <Input
-                id="total"
+                id="amount"
                 type="number"
-                value={config.total || ""}
-                onChange={(e) => setConfig({ ...config, total: Number.parseInt(e.target.value) })}
-                placeholder="1000"
+                value={config.amount || ""}
+                onChange={(e) => setConfig({ ...config, amount: Number.parseInt(e.target.value) })}
+                placeholder="1000000"
                 className="bg-gray-800 border-gray-600 text-white"
               />
             </div>
             <div>
-              <Label htmlFor="unitName" className="text-white">
-                Unit Name
+              <Label htmlFor="commitment" className="text-white">
+                NFT Commitment (Optional)
               </Label>
               <Input
-                id="unitName"
-                value={config.unitName || ""}
-                onChange={(e) => setConfig({ ...config, unitName: e.target.value })}
-                placeholder="TOKEN"
+                id="commitment"
+                value={config.commitment || ""}
+                onChange={(e) => setConfig({ ...config, commitment: e.target.value })}
+                placeholder="Hex string for NFT commitment"
                 className="bg-gray-800 border-gray-600 text-white"
               />
             </div>
             <div>
-              <Label htmlFor="assetName" className="text-white">
-                Asset Name
-              </Label>
-              <Input
-                id="assetName"
-                value={config.assetName || ""}
-                onChange={(e) => setConfig({ ...config, assetName: e.target.value })}
-                placeholder="My Token"
-                className="bg-gray-800 border-gray-600 text-white"
-              />
-            </div>
-            <div>
-              <Label htmlFor="decimals" className="text-white">
-                Decimals
-              </Label>
-              <Input
-                id="decimals"
-                type="number"
-                value={config.decimals || ""}
-                onChange={(e) => setConfig({ ...config, decimals: Number.parseInt(e.target.value) })}
-                placeholder="0"
-                className="bg-gray-800 border-gray-600 text-white"
-              />
-            </div>
-          </div>
-        )
-
-      case "applicationCall":
-        return (
-          <div className="space-y-4">
-            <div>
-              <Label htmlFor="appId" className="text-white">
-                Application ID
-              </Label>
-              <Input
-                id="appId"
-                type="number"
-                value={config.appId || ""}
-                onChange={(e) => setConfig({ ...config, appId: Number.parseInt(e.target.value) })}
-                placeholder="Enter App ID"
-                className="bg-gray-800 border-gray-600 text-white"
-              />
-            </div>
-            <div>
-              <Label htmlFor="method" className="text-white">
-                Method
+              <Label htmlFor="capability" className="text-white">
+                NFT Capability
               </Label>
               <Select
-                value={config.method || "call"}
-                onValueChange={(value) => setConfig({ ...config, method: value })}
+                value={config.capability || "none"}
+                onValueChange={(value) => setConfig({ ...config, capability: value })}
               >
                 <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-600">
-                  <SelectItem value="call">Call</SelectItem>
-                  <SelectItem value="create">Create</SelectItem>
-                  <SelectItem value="update">Update</SelectItem>
-                  <SelectItem value="delete">Delete</SelectItem>
-                  <SelectItem value="optin">Opt In</SelectItem>
-                  <SelectItem value="closeout">Close Out</SelectItem>
+                  <SelectItem value="none">None (Immutable)</SelectItem>
+                  <SelectItem value="mutable">Mutable</SelectItem>
+                  <SelectItem value="minting">Minting</SelectItem>
                 </SelectContent>
               </Select>
             </div>
+          </div>
+        )
+
+      case "opReturn":
+        return (
+          <div className="space-y-4">
             <div>
-              <Label htmlFor="args" className="text-white">
-                Arguments (JSON)
+              <Label htmlFor="message" className="text-white">
+                OP_RETURN Message
               </Label>
               <Textarea
-                id="args"
-                value={config.args || ""}
-                onChange={(e) => setConfig({ ...config, args: e.target.value })}
-                placeholder='["arg1", "arg2"]'
+                id="message"
+                value={config.message || ""}
+                onChange={(e) => setConfig({ ...config, message: e.target.value })}
+                placeholder="Enter message to store on-chain"
                 className="bg-gray-800 border-gray-600 text-white"
               />
+              <p className="text-xs text-gray-500 mt-1">
+                Data stored permanently on the blockchain
+              </p>
+            </div>
+          </div>
+        )
+
+      case "getBalance":
+        return (
+          <div className="space-y-4">
+            <div className="text-gray-400 text-sm">
+              This node will fetch the current BCH balance of the connected wallet.
+            </div>
+            <div>
+              <Label htmlFor="unit" className="text-white">
+                Display Unit
+              </Label>
+              <Select
+                value={config.unit || "bch"}
+                onValueChange={(value) => setConfig({ ...config, unit: value })}
+              >
+                <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-600">
+                  <SelectItem value="bch">BCH</SelectItem>
+                  <SelectItem value="sat">Satoshis</SelectItem>
+                  <SelectItem value="usd">USD</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )
+
+      case "waitForBalance":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="targetBalance" className="text-white">
+                Target Balance (BCH)
+              </Label>
+              <Input
+                id="targetBalance"
+                type="number"
+                step="0.00000001"
+                value={config.targetBalance || ""}
+                onChange={(e) => setConfig({ ...config, targetBalance: Number.parseFloat(e.target.value) })}
+                placeholder="0.001"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Execution will pause until wallet reaches this balance
+              </p>
             </div>
           </div>
         )
@@ -272,9 +293,8 @@ export function NodePropertiesPanel({ selectedNode, onClose, onUpdateNode }: Nod
                   <SelectValue />
                 </SelectTrigger>
                 <SelectContent className="bg-gray-800 border-gray-600">
-                  <SelectItem value="balance">Balance</SelectItem>
-                  <SelectItem value="asset">Asset Amount</SelectItem>
-                  <SelectItem value="time">Time</SelectItem>
+                  <SelectItem value="balance">BCH Balance</SelectItem>
+                  <SelectItem value="token">Token Balance</SelectItem>
                   <SelectItem value="custom">Custom</SelectItem>
                 </SelectContent>
               </Select>
@@ -308,7 +328,7 @@ export function NodePropertiesPanel({ selectedNode, onClose, onUpdateNode }: Nod
                 id="value"
                 value={config.value || ""}
                 onChange={(e) => setConfig({ ...config, value: e.target.value })}
-                placeholder="Comparison value"
+                placeholder="0.001"
                 className="bg-gray-800 border-gray-600 text-white"
               />
             </div>
@@ -333,21 +353,8 @@ export function NodePropertiesPanel({ selectedNode, onClose, onUpdateNode }: Nod
                   <SelectItem value="JSON">JSON</SelectItem>
                   <SelectItem value="TEXT">Text</SelectItem>
                   <SelectItem value="TABLE">Table</SelectItem>
-                  <SelectItem value="CHART">Chart</SelectItem>
                 </SelectContent>
               </Select>
-            </div>
-            <div>
-              <Label htmlFor="fields" className="text-white">
-                Display Fields
-              </Label>
-              <Textarea
-                id="fields"
-                value={config.fields || ""}
-                onChange={(e) => setConfig({ ...config, fields: e.target.value })}
-                placeholder="txId, amount, sender, receiver"
-                className="bg-gray-800 border-gray-600 text-white"
-              />
             </div>
           </div>
         )
@@ -364,7 +371,7 @@ export function NodePropertiesPanel({ selectedNode, onClose, onUpdateNode }: Nod
       <Card className="h-full bg-transparent border-none">
         <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3 border-b border-gray-700">
           <div className="flex items-center space-x-2">
-            <Settings className="h-4 w-4 text-blue-400" />
+            <Settings className="h-4 w-4 text-green-400" />
             <CardTitle className="text-white text-sm">Node Properties</CardTitle>
           </div>
           <Button variant="ghost" size="sm" onClick={onClose} className="text-gray-400 hover:text-white">
@@ -375,8 +382,8 @@ export function NodePropertiesPanel({ selectedNode, onClose, onUpdateNode }: Nod
           <div className="space-y-4">
             <div>
               <Label className="text-white font-semibold">Node Type</Label>
-              <Badge variant="secondary" className="mt-1">
-                {selectedNode.data.label}
+              <Badge variant="secondary" className="mt-1 bg-green-600/20 text-green-400">
+                {String(selectedNode.data.label)}
               </Badge>
             </div>
             <div>
@@ -391,7 +398,7 @@ export function NodePropertiesPanel({ selectedNode, onClose, onUpdateNode }: Nod
         </CardContent>
         <div className="p-4 border-t border-gray-700">
           <div className="flex space-x-2">
-            <Button onClick={handleSave} className="flex-1 bg-blue-600 hover:bg-blue-700">
+            <Button onClick={handleSave} className="flex-1 bg-green-600 hover:bg-green-700">
               Save Changes
             </Button>
             <Button

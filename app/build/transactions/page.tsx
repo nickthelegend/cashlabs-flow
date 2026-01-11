@@ -5,20 +5,21 @@ import { Button } from "@/components/ui/button"
 import { FlowBuilder } from "@/components/flow-builder"
 import { TerminalBuild } from "@/components/terminalbuild"
 import { toast } from "@/hooks/use-toast"
-import { Play, Download, Trash2, TerminalIcon } from "lucide-react"
+import { Play, Download, Trash2 } from "lucide-react"
 import { WalletPanel } from "@/components/wallet-panel"
 import { WalletButton } from "@/components/wallet-button"
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels"
-import algosdk from "algosdk"
 import { generateCode } from "@/lib/code-generator"
 
-interface Wallet {
+interface BCHWallet {
   address: string
+  cashaddr: string
   balance: number
-  privateKey: string
+  privateKeyWif: string
   mnemonic: string
+  derivationPath: string
   transactions: any[]
-  algoPrice: number
+  bchPrice: number
 }
 
 export default function TransactionsPage() {
@@ -28,45 +29,41 @@ export default function TransactionsPage() {
   const [edges, setEdges] = useState([])
   const [selectedNode, setSelectedNode] = useState(null)
   const [showWallet, setShowWallet] = useState(false)
-  const [wallet, setWallet] = useState<Wallet | null>(null)
+  const [wallet, setWallet] = useState<BCHWallet | null>(null)
 
   const handleRun = async () => {
     setTerminalOutput("")
     setIsTerminalOpen(true)
 
-    let logs = "[INFO] Starting transaction flow execution...\n"
+    let logs = "[INFO] Starting Bitcoin Cash flow execution...\n"
     setTerminalOutput(logs)
 
     toast({
       title: "Running Flow",
-      description: "Your Algorand flow is being executed...",
+      description: "Your Bitcoin Cash flow is being executed...",
       duration: 3000,
     })
 
     const generatedCode = generateCode(nodes, edges)
-    let modifiedGeneratedCode = generatedCode
-      .replace("import algosdk from 'algosdk';", "")
-      .replace("const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort);", "")
-      .replace("const params = await algodClient.getTransactionParams().do();", "")
 
     const originalConsoleLog = console.log
     const originalConsoleError = console.error
     const originalConsoleWarn = console.warn
-    
+
     console.log = (...args) => {
       const msg = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(" ")
       logs += `[LOG] ${msg}\n`
       setTerminalOutput(logs)
       originalConsoleLog.apply(console, args)
     }
-    
+
     console.error = (...args) => {
       const msg = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(" ")
       logs += `[ERROR] ${msg}\n`
       setTerminalOutput(logs)
       originalConsoleError.apply(console, args)
     }
-    
+
     console.warn = (...args) => {
       const msg = args.map(arg => typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)).join(" ")
       logs += `[WARN] ${msg}\n`
@@ -75,40 +72,96 @@ export default function TransactionsPage() {
     }
 
     try {
-      logs += "[INFO] Connecting to Algorand TestNet...\n"
+      logs += "[INFO] Loading mainnet-js library...\n"
       setTerminalOutput(logs)
 
-      const algodToken = 'YOUR_ALGOD_API_TOKEN'
-      const algodServer = 'https://testnet-api.algonode.cloud'
-      const algodPort = ''
+      const mainnetJs = await import("mainnet-js")
+      const { TestNetWallet, Wallet } = mainnetJs
 
-      const algodClient = new algosdk.Algodv2(algodToken, algodServer, algodPort)
-      
-      logs += "[INFO] Fetching transaction parameters...\n"
+      logs += "[INFO] Bitcoin Cash library loaded successfully!\n"
       setTerminalOutput(logs)
-      
-      const params = await algodClient.getTransactionParams().do()
-      
-      logs += `[INFO] Current round: ${params.firstRound}\n`
-      logs += `[INFO] Fee: ${params.fee} microAlgos\n`
-      logs += `[INFO] Genesis ID: ${params.genesisID}\n`
-      logs += "[INFO] Executing transaction flow...\n"
+
+      // Get wallet from localStorage
+      const savedWallet = localStorage.getItem("bch-wallet")
+      if (!savedWallet) {
+        throw new Error("No wallet found. Please create a wallet first.")
+      }
+
+      const parsedWallet = JSON.parse(savedWallet)
+      if (!parsedWallet.privateKeyWif) {
+        throw new Error("Invalid wallet data. Please recreate your wallet.")
+      }
+
+      logs += "[INFO] Recreating wallet from stored credentials...\n"
+      setTerminalOutput(logs)
+
+      const bchWallet = await TestNetWallet.fromWIF(parsedWallet.privateKeyWif)
+
+      logs += `[INFO] Wallet address: ${bchWallet.cashaddr}\n`
+      setTerminalOutput(logs)
+
+      logs += "[INFO] Fetching current balance...\n"
+      setTerminalOutput(logs)
+
+      const balance = await bchWallet.getBalance()
+
+      logs += `[INFO] Current balance: ${balance.bch} BCH (${balance.sat} satoshis)\n`
+      logs += `[INFO] USD value: $${balance.usd?.toFixed(2) || 'N/A'}\n`
       logs += "-----------------------------------\n"
       setTerminalOutput(logs)
 
-      const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor
-      const runnableCode = new AsyncFunction('algosdk', 'algodClient', 'params', modifiedGeneratedCode)
-      
-      const result = await runnableCode(algosdk, algodClient, params)
-      
-      if (result !== undefined) {
-        logs += `[RESULT] ${typeof result === 'object' ? JSON.stringify(result, null, 2) : result}\n`
+      // Process nodes
+      for (const node of nodes) {
+        if (node.type === 'payment' && node.data.config.receiver) {
+          const { receiver, amount } = node.data.config
+          logs += `[INFO] Processing payment: ${amount} BCH to ${receiver}\n`
+          setTerminalOutput(logs)
+
+          if (balance.sat < amount * 100000000) {
+            logs += `[WARN] Insufficient balance for this transaction\n`
+            setTerminalOutput(logs)
+            continue
+          }
+
+          try {
+            const txData = await bchWallet.send([
+              {
+                cashaddr: receiver,
+                value: amount,
+                unit: 'bch',
+              }
+            ])
+            logs += `[SUCCESS] Transaction sent! TxID: ${txData.txId}\n`
+            logs += `[INFO] New balance: ${txData.balance.bch} BCH\n`
+            setTerminalOutput(logs)
+          } catch (txError: any) {
+            logs += `[ERROR] Transaction failed: ${txError.message}\n`
+            setTerminalOutput(logs)
+          }
+        }
+
+        if (node.type === 'opReturn' && node.data.config.message) {
+          const { message } = node.data.config
+          logs += `[INFO] Sending OP_RETURN message: "${message}"\n`
+          setTerminalOutput(logs)
+
+          try {
+            const txData = await bchWallet.send([
+              ["OP_RETURN", message]
+            ])
+            logs += `[SUCCESS] OP_RETURN sent! TxID: ${txData.txId}\n`
+            setTerminalOutput(logs)
+          } catch (txError: any) {
+            logs += `[ERROR] OP_RETURN failed: ${txError.message}\n`
+            setTerminalOutput(logs)
+          }
+        }
       }
 
       logs += "-----------------------------------\n"
-      logs += "[SUCCESS] Flow execution completed successfully!\n"
+      logs += "[SUCCESS] Flow execution completed!\n"
       setTerminalOutput(logs)
-      
+
       toast({
         title: "Flow Execution Complete",
         description: "Check terminal for output.",
@@ -117,15 +170,12 @@ export default function TransactionsPage() {
     } catch (error: any) {
       logs += "-----------------------------------\n"
       logs += `[ERROR] Execution failed: ${error.message}\n`
-      if (error.response) {
-        logs += `[ERROR] Response: ${JSON.stringify(error.response, null, 2)}\n`
-      }
       if (error.stack) {
         logs += `[ERROR] Stack trace:\n${error.stack}\n`
       }
       logs += "-----------------------------------\n"
       setTerminalOutput(logs)
-      
+
       toast({
         title: "Flow Execution Failed",
         description: error.message,
@@ -148,10 +198,10 @@ export default function TransactionsPage() {
             <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
             <div className="w-3 h-3 rounded-full bg-[#28ca42]"></div>
           </div>
-          <span className="font-medium" style={{ color: "var(--text-color)" }}>AlgoFlow - Transactions</span>
+          <span className="font-medium" style={{ color: "var(--text-color)" }}>CashLabs - BCH Transactions</span>
         </div>
         <div className="flex items-center gap-2">
-          <WalletButton 
+          <WalletButton
             onWalletChange={setWallet}
             onTogglePanel={() => setShowWallet(!showWallet)}
           />
@@ -172,12 +222,12 @@ export default function TransactionsPage() {
                 const url = URL.createObjectURL(dataBlob)
                 const link = document.createElement("a")
                 link.href = url
-                link.download = `algorand-script-${Date.now()}.js`
+                link.download = `bch-script-${Date.now()}.js`
                 link.click()
                 URL.revokeObjectURL(url)
                 toast({
                   title: "Code Exported",
-                  description: "Your Algorand script has been exported as a .js file",
+                  description: "Your Bitcoin Cash script has been exported as a .js file",
                   duration: 3000,
                 })
               }}
@@ -229,7 +279,7 @@ export default function TransactionsPage() {
           </Panel>
           {showWallet && wallet && (
             <>
-              <PanelResizeHandle className="w-1 bg-[var(--border-color)] hover:bg-blue-500 transition-colors" />
+              <PanelResizeHandle className="w-1 bg-[var(--border-color)] hover:bg-green-500 transition-colors" />
               <Panel defaultSize={25} minSize={15} maxSize={50}>
                 <WalletPanel wallet={wallet} onClose={() => setShowWallet(false)} />
               </Panel>

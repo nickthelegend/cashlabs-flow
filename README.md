@@ -1,28 +1,29 @@
-# AlgoFlow - Visual Algorand Smart Contract & Transaction Builder
+# CashLabs FLOW - Visual Bitcoin Cash Smart Contract & Transaction Builder
 
-A visual, node-based development environment for building and deploying Algorand smart contracts and transactions without writing code.
+A visual, node-based development environment for building and deploying Bitcoin Cash smart contracts and transactions without writing code. Powered by **CashScript** and **mainnet-js**.
 
 ## Overview
 
-AlgoFlow is a powerful visual programming platform that enables developers to create Algorand blockchain applications using an intuitive drag-and-drop interface. Build smart contracts, compose transactions, and deploy to the Algorand network - all through a visual flow builder.
+CashLabs FLOW is a powerful visual programming platform that enables developers to create Bitcoin Cash (BCH) blockchain applications using an intuitive drag-and-drop interface. Build smart contracts, compose transactions, and deploy to the BCH network - all through a visual flow builder.
 
 ## Key Features
 
-- **Visual Flow Builder**: Drag-and-drop interface for building Algorand applications
-- **Smart Contract Builder**: Create and deploy smart contracts visually
-- **Transaction Composer**: Build complex transaction flows without code
-- **Live Code Generation**: See JavaScript code generated in real-time
-- **Wallet Integration**: Connect with Algorand wallets (Pera, Defly, Exodus, Lute)
-- **Built-in Terminal**: Execute and test your flows directly in the browser
-- **Dark/Light Mode**: Comfortable development environment
+- **Visual Flow Builder**: Drag-and-drop interface for building BCH transaction paths
+- **CashScript Smart Contract Builder**: Create and deploy smart contracts visually using CashScript blocks
+- **CashToken Support**: Native support for creating and transferring fungible tokens and NFTs
+- **Live Code Generation**: See CashScript and mainnet-js code generated in real-time
+- **Wait for Balance**: Unique utility nodes to handle asynchronous transaction flows
+- **TestNet Support**: Built-in support for ChipNet / TestNet4
+- **Built-in BCH Wallet**: Create and manage TestNet wallets locally
 
 ## Technology Stack
 
 - **Frontend**: Next.js 14 with App Router
 - **UI Components**: shadcn/ui with Tailwind CSS
 - **Flow Editor**: React Flow
-- **Blockchain**: Algorand SDK (algosdk)
-- **Wallet Integration**: Algorand wallets
+- **Visual Programming**: Blockly (for Smart Contracts)
+- **Blockchain**: mainnet-js
+- **Smart Contracts**: CashScript
 - **Code Generation**: Custom AST-based generator
 
 ## Getting Started
@@ -31,14 +32,13 @@ AlgoFlow is a powerful visual programming platform that enables developers to cr
 
 - Node.js 18+ installed
 - npm, yarn, or pnpm package manager
-- An Algorand wallet (optional, for testing)
 
 ### Installation
 
 1. Clone this repository:
    ```bash
-   git clone https://github.com/yourusername/algoflow.git
-   cd algoflow
+   git clone https://github.com/cashlabs/flow.git
+   cd cashlabs-flow
    ```
 
 2. Install dependencies:
@@ -51,37 +51,41 @@ AlgoFlow is a powerful visual programming platform that enables developers to cr
    npm run dev
    ```
 
-4. Open [http://localhost:3000](http://localhost:3000) in your browser to see the result.
+4. Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ## Project Structure
 
 ```
 ├── app/
 │   ├── build/
-│   │   ├── contracts/    # Smart contract builder
-│   │   └── transactions/ # Transaction builder
+│   │   ├── contracts/    # CashScript visual builder (Pro/Noob)
+│   │   └── transactions/ # Transaction flow builder
 │   ├── layout.tsx        # Root layout
-│   └── page.tsx          # Home page
+│   └── page.tsx          # Home page with BCH branding
 ├── components/
-│   ├── flow-builder.tsx  # Main flow editor
-│   ├── node-sidebar.tsx  # Node palette
-│   ├── wallet-panel.tsx  # Wallet interface
-│   ├── terminalbuild.tsx # Execution terminal
-│   └── ui/               # UI components
+│   ├── flow-builder.tsx  # Main React Flow editor
+│   ├── node-sidebar.tsx  # Node palette for BCH operations
+│   ├── wallet-panel.tsx  # BCH Wallet interface (mainnet-js)
+│   ├── BlockPicker.tsx   # Blockly blocks for CashScript
+│   └── nodes/            # custom React Flow node components
 ├── lib/
-│   └── code-generator.ts # Code generation engine
-└── public/               # Static assets
+│   └── code-generator.ts # BCH/mainnet-js code generation logic
+└── public/               # Static assets and logos
 ```
 
 ## Quick Start
 
-1. **Create a Wallet**: Click the wallet button to generate a new Algorand wallet
-2. **Build a Flow**: Drag nodes from the sidebar onto the canvas
-3. **Connect Nodes**: Link nodes together to create your logic flow
-4. **Deploy**: Click "Deploy Contract" or "Run Flow" to execute
-5. **Export Code**: Download the generated JavaScript code
+1. **Create a BCH Wallet**: Open the Transaction builder and click the wallet button to generate a TestNet wallet.
+2. **Build a Flow**: Drag BCH nodes from the sidebar onto the canvas (Send BCH, CashToken Create, etc.).
+3. **Connect Nodes**: Link nodes to define the execution order and logic.
+4. **Deploy Contract**: Use the Contract Builder to create CashScript logic visually and download the `.cash` file.
+5. **Run**: Execute transaction flows directly from the builder.
 
-For detailed instructions, see [FULL_guide.md](./FULL_guide.md)
+## Documentation
+
+- [CashScript Docs](https://cashscript.org/)
+- [Mainnet-js Docs](https://mainnet.cash/)
+- [Bitcoin Cash SDK Guide](./docs/tutorial/README.md)
 
 ## Contributing
 
@@ -91,14 +95,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 This project is licensed under the MIT License - see the LICENSE file for details.
 
-## Documentation
+---
 
-- [Full Guide](./FULL_guide.md) - Complete documentation
-- [Algorand Docs](https://developer.algorand.org/)
-
-## Acknowledgments
-
-- [Algorand](https://www.algorand.com/)
-- [Next.js](https://nextjs.org/)
-- [React Flow](https://reactflow.dev/)
-- [shadcn/ui](https://ui.shadcn.com/)
+Built with 💚 for the Bitcoin Cash community.

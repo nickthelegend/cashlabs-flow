@@ -1,41 +1,42 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Download, Copy, Play } from "lucide-react"
+import { Download, Copy, Play, FileCode } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import Editor from "@monaco-editor/react"
 
-export default function CodePreview({ 
-  xml, 
-  code 
-}: { 
+export default function CodePreview({
+  xml,
+  code
+}: {
   xml: string
-  code: string 
+  code: string
 }) {
 
-  const handleOpenInIDE = () => {
-    const base64Code = btoa(code)
-    const url = `http://ide.algocraft.fun/api/load-contract?contract=${encodeURIComponent(base64Code)}`
-    window.open(url, '_blank')
+  const handleOpenPlayground = () => {
+    // CashScript playground uses a different format, but we can at least copy and provide a link
+    window.open('https://playground.cashscript.org/', '_blank')
     toast({
-      title: "Opening in IDE",
-      description: "Loading contract in external IDE",
-      duration: 2000,
+      title: "Opening Playground",
+      description: "Paste your code into the CashScript Playground",
+      duration: 3000,
     })
   }
 
   const handleDownload = () => {
-    const blob = new Blob([code], { type: "text/javascript" })
+    const isCashScript = code.includes('pragma cashscript') || code.includes('contract')
+    const extension = isCashScript ? 'cash' : 'js'
+    const blob = new Blob([code], { type: "text/plain" })
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
     link.href = url
-    link.download = `contract-${Date.now()}.js`
+    link.download = `contract-${Date.now()}.${extension}`
     link.click()
     URL.revokeObjectURL(url)
-    
+
     toast({
       title: "Code Exported",
-      description: "Contract code downloaded successfully",
+      description: `Contract code (.${extension}) downloaded successfully`,
       duration: 2000,
     })
   }
@@ -54,72 +55,78 @@ export default function CodePreview({
     const url = URL.createObjectURL(blob)
     const link = document.createElement("a")
     link.href = url
-    link.download = `workspace-${Date.now()}.xml`
+    link.download = `cashlabs-workspace-${Date.now()}.xml`
     link.click()
     URL.revokeObjectURL(url)
-    
+
     toast({
       title: "Workspace Exported",
-      description: "Workspace XML downloaded successfully",
+      description: "Blockly workspace XML downloaded successfully",
       duration: 2000,
     })
   }
 
   return (
-    <div style={{ 
-      height: "100%", 
-      overflow: "auto", 
+    <div style={{
+      height: "100%",
+      overflow: "auto",
       color: "#e6e6e6",
-      background: "#111",
+      background: "#0a0a0a",
       display: "flex",
       flexDirection: "column"
     }}>
-      <div style={{ 
-        padding: 16, 
+      <div style={{
+        padding: 16,
         borderBottom: "1px solid #222",
         display: "flex",
         justifyContent: "space-between",
-        alignItems: "center"
+        alignItems: "center",
+        background: "#111"
       }}>
-        <h4 style={{ 
-          color: "#fff", 
-          fontSize: 16, 
+        <h4 style={{
+          color: "#fff",
+          fontSize: 14,
           fontWeight: 600,
-          margin: 0 
+          margin: 0,
+          display: "flex",
+          alignItems: "center",
+          gap: "6px"
         }}>
+          <FileCode className="h-4 w-4 text-green-500" />
           Code Preview
         </h4>
         <div style={{ display: "flex", gap: 8 }}>
-          <Button 
-            size="sm" 
-            onClick={handleOpenInIDE}
-            style={{ 
-              background: "#16a34a", 
+          <Button
+            size="sm"
+            onClick={handleOpenPlayground}
+            style={{
+              background: "#22c55e",
               border: "none",
-              color: "#fff"
+              color: "#000",
+              fontWeight: "600"
             }}
           >
             <Play className="h-3 w-3 mr-1" />
-            Open in IDE
+            Playground
           </Button>
-          <Button 
-            size="sm" 
+          <Button
+            size="sm"
             variant="outline"
             onClick={handleCopy}
-            style={{ 
-              background: "#1a1a1a", 
+            style={{
+              background: "#1a1a1a",
               border: "1px solid #333",
               color: "#fff"
             }}
           >
             <Copy className="h-3 w-3" />
           </Button>
-          <Button 
-            size="sm" 
+          <Button
+            size="sm"
             variant="outline"
             onClick={handleDownload}
-            style={{ 
-              background: "#1a1a1a", 
+            style={{
+              background: "#1a1a1a",
               border: "1px solid #333",
               color: "#fff"
             }}
@@ -128,15 +135,15 @@ export default function CodePreview({
           </Button>
         </div>
       </div>
-      
-      <div style={{ 
+
+      <div style={{
         flex: 1,
         overflow: "hidden"
       }}>
         <Editor
           height="100%"
-          defaultLanguage="typescript"
-          value={code || "// Build your contract using blocks"}
+          defaultLanguage="typescript" // CashScript looks similar to TS/Solidity
+          value={code || "// Drag blocks to generate Bitcoin Cash code"}
           theme="vs-dark"
           options={{
             readOnly: true,
@@ -159,17 +166,18 @@ export default function CodePreview({
         />
       </div>
 
-      <div style={{ 
-        padding: 16, 
-        borderTop: "1px solid #222" 
+      <div style={{
+        padding: 16,
+        borderTop: "1px solid #222",
+        background: "#111"
       }}>
-        <Button 
-          size="sm" 
+        <Button
+          size="sm"
           variant="outline"
           onClick={handleDownloadXml}
-          style={{ 
+          style={{
             width: "100%",
-            background: "#1a1a1a", 
+            background: "#1a1a1a",
             border: "1px solid #333",
             color: "#fff"
           }}
