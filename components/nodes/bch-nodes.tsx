@@ -2,7 +2,7 @@
 
 import { memo, useRef } from "react"
 import { Handle, Position } from "@xyflow/react"
-import { Wallet, Send, Coins, FileCode, CheckCircle, Play, Snowflake, FileText, Clock, Layers, PlusSquare, Zap, TrendingUp, UserPlus, Clock3, Flame, Hammer, Image as ImageIcon, Users, List, Monitor, Upload, Download, Eye, PenLine, ShieldCheck, Key } from "lucide-react"
+import { Wallet, Send, Coins, FileCode, CheckCircle, Play, Snowflake, FileText, Clock, Layers, PlusSquare, Zap, TrendingUp, UserPlus, Clock3, Flame, Hammer, Image as ImageIcon, Users, List, Monitor, Upload, Download, Eye, PenLine, ShieldCheck, Key, Scissors, Merge, GitBranch, Settings2, Shuffle, EqualNot, Infinity, Calculator, Database, ArrowRight, RefreshCcw, Shield } from "lucide-react"
 
 const baseNodeStyle = {
   padding: "12px 16px",
@@ -72,8 +72,6 @@ export const ImageUploadNode = memo(({ data }: any) => {
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const handleUploadClick = () => {
-    // Note: In a real flow, you'd use a callback passed through data
-    // Here we just trigger the hidden input if it were connected to state
     fileInputRef.current?.click()
   }
 
@@ -175,6 +173,166 @@ export const WalletGenNode = memo(({ data }: any) => (
   </div>
 ))
 WalletGenNode.displayName = "WalletGenNode"
+
+// --- PRIVACY & UTXO NODES ---
+
+export const UTXOSelectionNode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(135deg, #475569, #1e293b)", border: "2px solid #64748b" }}>
+    <Handle type="target" position={Position.Left} style={{ background: "#64748b" }} />
+    <Handle type="source" position={Position.Right} style={{ background: "#64748b" }} />
+    <div className="flex items-center gap-2">
+      <CheckCircle className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">SELECT UTXOs</span>
+    </div>
+    <div className="text-white/60 text-[10px] mt-1 italic">Manual Coin Selection</div>
+  </div>
+))
+
+export const SplitUTXONode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(135deg, #ec4899, #be185d)", border: "2px solid #f472b6" }}>
+    <Handle type="target" position={Position.Left} style={{ background: "#f472b6" }} />
+    <Handle type="source" position={Position.Right} style={{ background: "#f472b6" }} />
+    <div className="flex items-center gap-2">
+      <Scissors className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">SPLIT UTXO</span>
+    </div>
+    <div className="text-white/60 text-[10px] mt-1 italic">1 Input → N Outputs</div>
+  </div>
+))
+
+export const MergeUTXONode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(135deg, #0ea5e9, #0369a1)", border: "2px solid #7dd3fc" }}>
+    <Handle type="target" position={Position.Left} style={{ background: "#7dd3fc" }} />
+    <Handle type="source" position={Position.Right} style={{ background: "#7dd3fc" }} />
+    <div className="flex items-center gap-2">
+      <Merge className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">MERGE UTXOs</span>
+    </div>
+    <div className="text-white/60 text-[10px] mt-1 italic">Consolidate Dust</div>
+  </div>
+))
+
+export const BatchPaymentNode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(135deg, #10b981, #065f46)", border: "2px solid #34d399" }}>
+    <Handle type="target" position={Position.Left} style={{ background: "#34d399" }} />
+    <Handle type="source" position={Position.Right} style={{ background: "#34d399" }} />
+    <div className="flex items-center gap-2">
+      <Layers className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">BATCH PAY</span>
+    </div>
+    <div className="text-white/60 text-[10px] mt-1 italic">Optimized Fee Batch</div>
+  </div>
+))
+
+export const FeeNode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(135deg, #f59e0b, #92400e)", border: "2px solid #fbbf24" }}>
+    <Handle type="target" position={Position.Left} style={{ background: "#fbbf24" }} />
+    <Handle type="source" position={Position.Right} style={{ background: "#fbbf24" }} />
+    <div className="flex items-center gap-2">
+      <Settings2 className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">FEE CONTROL</span>
+    </div>
+    <div className="text-white/60 text-[10px] mt-1 italic">{data.config?.rate || 1} sat/byte</div>
+  </div>
+))
+
+export const ShuffleNode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(135deg, #8b5cf6, #5b21b6)", border: "2px solid #a78bfa" }}>
+    <Handle type="target" position={Position.Left} style={{ background: "#a78bfa" }} />
+    <Handle type="source" position={Position.Right} style={{ background: "#a78bfa" }} />
+    <div className="flex items-center gap-2">
+      <Shuffle className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">SHUFFLE</span>
+    </div>
+    <div className="text-white/60 text-[10px] mt-1 italic">Randomize Outputs</div>
+  </div>
+))
+
+export const EqualizeNode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(135deg, #6366f1, #3730a3)", border: "2px solid #818cf8" }}>
+    <Handle type="target" position={Position.Left} style={{ background: "#818cf8" }} />
+    <Handle type="source" position={Position.Right} style={{ background: "#818cf8" }} />
+    <div className="flex items-center gap-2">
+      <EqualNot className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">EQUALIZE</span>
+    </div>
+    <div className="text-white/60 text-[10px] mt-1 italic">Normalize Amounts</div>
+  </div>
+))
+
+export const MixPoolNode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(225deg, #06b6d4, #0891b2)", border: "2px solid #22d3ee", borderStyle: "dashed" }}>
+    <Handle type="target" position={Position.Left} style={{ background: "#22d3ee" }} />
+    <Handle type="source" position={Position.Right} style={{ background: "#22d3ee" }} />
+    <div className="flex items-center gap-2">
+      <RefreshCcw className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">MIX POOL</span>
+    </div>
+    <div className="text-white/60 text-[10px] mt-1 italic italic">CoinJoin Prep</div>
+  </div>
+))
+
+export const AutoRemixNode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(135deg, #10b981, #064e3b)", border: "2px solid #34d399" }}>
+    <Handle type="target" position={Position.Left} style={{ background: "#34d399" }} />
+    <Handle type="source" position={Position.Right} style={{ background: "#34d399" }} />
+    <div className="flex items-center gap-2">
+      <Infinity className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">AUTO REMIX</span>
+    </div>
+    <div className="text-white/60 text-[10px] mt-1 italic">Anon Score Target: {data.config?.target || 5}</div>
+  </div>
+))
+
+// --- LOGIC NODES ---
+
+export const LoopNode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(135deg, #4f46e5, #312e81)", border: "2px solid #6366f1" }}>
+    <Handle type="target" position={Position.Left} style={{ background: "#6366f1" }} />
+    <Handle type="source" position={Position.Right} style={{ background: "#6366f1" }} />
+    <div className="flex items-center gap-2">
+      <RefreshCcw className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">LOOP</span>
+    </div>
+    <div className="text-white/60 text-[10px] mt-1 italic">{data.config?.iterations || 0} times</div>
+  </div>
+))
+
+export const MathNode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(135deg, #d946ef, #701a75)", border: "2px solid #f0abfc" }}>
+    <Handle type="target" position={Position.Left} style={{ background: "#f0abfc" }} />
+    <Handle type="source" position={Position.Right} style={{ background: "#f0abfc" }} />
+    <div className="flex items-center gap-2">
+      <Calculator className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">MATH</span>
+    </div>
+    <div className="text-white/60 text-[10px] mt-1 italic">{data.config?.operation || 'sum'}</div>
+  </div>
+))
+
+export const VariableNode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(135deg, #1e293b, #0f172a)", border: "2px solid #475569" }}>
+    <Handle type="target" position={Position.Left} style={{ background: "#475569" }} />
+    <Handle type="source" position={Position.Right} style={{ background: "#475569" }} />
+    <div className="flex items-center gap-2">
+      <Database className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">{data.config?.key || 'VAR'}</span>
+    </div>
+    <div className="text-white/60 text-[10px] mt-1 italic">Value: {data.config?.value || 'null'}</div>
+  </div>
+))
+
+export const CustomChangeNode = memo(({ data }: any) => (
+  <div style={{ ...baseNodeStyle, background: "linear-gradient(135deg, #334155, #1e293b)", border: "2px solid #64748b" }}>
+    <Handle type="target" position={Position.Left} style={{ background: "#64748b" }} />
+    <Handle type="source" position={Position.Right} style={{ background: "#64748b" }} />
+    <div className="flex items-center gap-2">
+      <ArrowRight className="w-5 h-5 text-white" />
+      <span className="text-white font-bold text-sm">CHANGE OUT</span>
+    </div>
+    <div className="text-white/60 text-[10px] mt-1 italic">Custom Address</div>
+  </div>
+))
 
 // Token Holders Node
 export const TokenHoldersNode = memo(({ data }: any) => (

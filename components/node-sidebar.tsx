@@ -29,7 +29,19 @@ import {
   Eye,
   PenLine,
   ShieldCheck,
-  Key
+  Key,
+  Scissors,
+  Merge,
+  Settings2,
+  Shuffle,
+  EqualNot,
+  Infinity,
+  Calculator,
+  Database,
+  ArrowRight,
+  RefreshCcw,
+  CheckCircle,
+  Layers
 } from "lucide-react"
 
 interface NodeSidebarProps {
@@ -55,7 +67,6 @@ const bchNodes = [
     color: "text-slate-400",
     bg: "bg-slate-400/10",
     category: "Core",
-    isNew: true,
   },
   {
     id: "generateWallet",
@@ -65,7 +76,6 @@ const bchNodes = [
     color: "text-amber-400",
     bg: "bg-amber-400/10",
     category: "Core",
-    isNew: true,
   },
   {
     id: "prepareWallet",
@@ -75,6 +85,75 @@ const bchNodes = [
     color: "text-orange-400",
     bg: "bg-orange-400/10",
     category: "Core",
+  },
+  {
+    id: "selectUTXOs",
+    label: "SELECT UTXOs",
+    description: "Manually pick specific coins to spend",
+    icon: CheckCircle,
+    color: "text-slate-300",
+    bg: "bg-slate-300/10",
+    category: "Privacy & UTXO",
+    isNew: true,
+  },
+  {
+    id: "splitUTXO",
+    label: "SPLIT UTXO",
+    description: "Split 1 input into N outputs (Privacy Prep)",
+    icon: Scissors,
+    color: "text-pink-400",
+    bg: "bg-pink-400/10",
+    category: "Privacy & UTXO",
+    isNew: true,
+  },
+  {
+    id: "mergeUTXOs",
+    label: "MERGE UTXOs",
+    description: "Consolidate dust into one UTXO",
+    icon: Merge,
+    color: "text-sky-400",
+    bg: "bg-sky-400/10",
+    category: "Privacy & UTXO",
+    isNew: true,
+  },
+  {
+    id: "shuffleOutputs",
+    label: "SHUFFLE",
+    description: "Randomize output order for basic privacy",
+    icon: Shuffle,
+    color: "text-purple-400",
+    bg: "bg-purple-400/10",
+    category: "Privacy & UTXO",
+    isNew: true,
+  },
+  {
+    id: "equalizeAmounts",
+    label: "EQUALIZE",
+    description: "Normalize output amounts (CoinJoin prep)",
+    icon: EqualNot,
+    color: "text-indigo-400",
+    bg: "bg-indigo-400/10",
+    category: "Privacy & UTXO",
+    isNew: true,
+  },
+  {
+    id: "mixPoolJoin",
+    label: "MIX POOL",
+    description: "Join a collaborative transaction mixing round",
+    icon: RefreshCcw,
+    color: "text-cyan-400",
+    bg: "bg-cyan-400/10",
+    category: "Privacy & UTXO",
+    isNew: true,
+  },
+  {
+    id: "autoRemix",
+    label: "AUTO REMIX",
+    description: "Loop mix until anonymity target reached",
+    icon: Infinity,
+    color: "text-emerald-400",
+    bg: "bg-emerald-400/10",
+    category: "Privacy & UTXO",
     isNew: true,
   },
   {
@@ -94,6 +173,35 @@ const bchNodes = [
     color: "text-emerald-400",
     bg: "bg-emerald-400/10",
     category: "Transaction",
+  },
+  {
+    id: "batchPayments",
+    label: "BATCH PAY",
+    description: "Optimized fee batch processing",
+    icon: Layers,
+    color: "text-teal-400",
+    bg: "bg-teal-400/10",
+    category: "Transaction",
+    isNew: true,
+  },
+  {
+    id: "customChange",
+    label: "CHANGE OUT",
+    description: "Explicitly set the change return address",
+    icon: ArrowRight,
+    color: "text-slate-400",
+    bg: "bg-slate-400/10",
+    category: "Transaction",
+    isNew: true,
+  },
+  {
+    id: "feeController",
+    label: "FEE CONTROL",
+    description: "Set custom sat/byte or priority levels",
+    icon: Settings2,
+    color: "text-amber-400",
+    bg: "bg-amber-400/10",
+    category: "Transaction",
     isNew: true,
   },
   {
@@ -106,26 +214,6 @@ const bchNodes = [
     category: "Token",
   },
   {
-    id: "imageUpload",
-    label: "NFT IMAGE",
-    description: "Upload and preview NFT artwork",
-    icon: ImageIcon,
-    color: "text-pink-400",
-    bg: "bg-pink-400/10",
-    category: "Token",
-    isNew: true,
-  },
-  {
-    id: "tokenMint",
-    label: "MINT TOKEN",
-    description: "Mint additional supply of an existing token",
-    icon: PlusSquare,
-    color: "text-amber-400",
-    bg: "bg-amber-400/10",
-    category: "Token",
-    isNew: true,
-  },
-  {
     id: "tokenTransfer",
     label: "TRANSFER TOKEN",
     description: "Send CashTokens to another address",
@@ -135,73 +223,43 @@ const bchNodes = [
     category: "Token",
   },
   {
-    id: "tokenBurn",
-    label: "BURN TOKEN",
-    description: "Permanently destroy CashTokens",
-    icon: Flame,
-    color: "text-rose-400",
-    bg: "bg-rose-400/10",
-    category: "Token",
-    isNew: true,
-  },
-  {
-    id: "signMessage",
-    label: "SIGN MESSAGE",
-    description: "Sign text cryptographically with your key",
-    icon: PenLine,
-    color: "text-violet-400",
-    bg: "bg-violet-400/10",
-    category: "Utility",
-    isNew: true,
-  },
-  {
-    id: "verifyMessage",
-    label: "VERIFY MESSAGE",
-    description: "Check if a signature matches an address",
-    icon: ShieldCheck,
-    color: "text-emerald-400",
-    bg: "bg-emerald-400/10",
-    category: "Utility",
-    isNew: true,
-  },
-  {
-    id: "assetList",
-    label: "FETCH ASSETS",
-    description: "Get all tokens held in the wallet",
-    icon: List,
-    color: "text-cyan-400",
-    bg: "bg-cyan-400/10",
-    category: "Analytics",
-    isNew: true,
-  },
-  {
-    id: "tokenHolders",
-    label: "TOKEN HOLDERS",
-    description: "Fetch holders list and export to CSV",
-    icon: Users,
+    id: "loop",
+    label: "LOOP",
+    description: "Repeat the subsequent flow steps N times",
+    icon: RefreshCcw,
     color: "text-indigo-400",
     bg: "bg-indigo-400/10",
-    category: "Analytics",
+    category: "Logic",
     isNew: true,
   },
   {
-    id: "opReturn",
-    label: "OP_RETURN",
-    description: "Embed data permanently into the blockchain",
-    icon: FileText,
-    color: "text-orange-400",
-    bg: "bg-orange-400/10",
-    category: "Core",
+    id: "mathNode",
+    label: "MATH",
+    description: "Perform arithmetic on balances/variables",
+    icon: Calculator,
+    color: "text-pink-400",
+    bg: "bg-pink-400/10",
+    category: "Logic",
+    isNew: true,
   },
   {
-    id: "priceFeed",
-    label: "PRICE FEED",
-    description: "Get real-time BCH market prices",
-    icon: TrendingUp,
-    color: "text-blue-400",
-    bg: "bg-blue-400/10",
-    category: "Utility",
+    id: "variableNode",
+    label: "VARIABLE",
+    description: "Store or retrieve values in flow memory",
+    icon: Database,
+    color: "text-slate-400",
+    bg: "bg-slate-400/10",
+    category: "Logic",
     isNew: true,
+  },
+  {
+    id: "condition",
+    label: "CONDITION",
+    description: "If/Else logic based on balances or data",
+    icon: GitBranch,
+    color: "text-teal-400",
+    bg: "bg-teal-400/10",
+    category: "Logic",
   },
   {
     id: "delay",
@@ -211,7 +269,6 @@ const bchNodes = [
     color: "text-indigo-400",
     bg: "bg-indigo-400/10",
     category: "Utility",
-    isNew: true,
   },
   {
     id: "output",
@@ -221,7 +278,6 @@ const bchNodes = [
     color: "text-gray-400",
     bg: "bg-gray-400/10",
     category: "Utility",
-    isNew: true,
   },
   {
     id: "executeTxn",
@@ -262,19 +318,19 @@ export function NodeSidebar({ type, onNodeClick }: NodeSidebarProps) {
 
   return (
     <div className="w-[260px] h-full bg-[#0d0d0d] border-r border-[#1a1a1a] flex flex-col overflow-hidden shadow-2xl">
-      <div className="p-4 pb-2">
-        <h2 className="text-white text-base font-bold flex items-center gap-2">
-          <Search className="w-3.5 h-3.5 text-green-500" />
-          Add Tile
+      <div className="p-4 pb-2 text-center">
+        <h2 className="text-white text-base font-bold flex items-center justify-center gap-2">
+          <Zap className="w-4 h-4 text-green-500 fill-green-500" />
+          BCH BLOCKS
         </h2>
-        <p className="text-gray-500 text-[10px] mt-0.5">Click or drag to your flow</p>
+        <p className="text-gray-500 text-[10px] mt-0.5">Drag tiles to the workspace</p>
       </div>
 
       <div className="px-4 pb-3">
         <div className="relative group">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 group-focus-within:text-green-500 transition-colors" />
           <Input
-            placeholder="Search tiles..."
+            placeholder="Search blocks..."
             className="pl-8 bg-[#1a1a1a] border-none text-white placeholder:text-gray-600 focus-visible:ring-1 focus-visible:ring-green-500/50 h-8 rounded-lg text-xs"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
@@ -306,10 +362,10 @@ export function NodeSidebar({ type, onNodeClick }: NodeSidebarProps) {
                       <div className="flex items-center gap-1.5">
                         <span className="text-white text-xs font-semibold truncate">{node.label}</span>
                         {node.isNew && (
-                          <span className="px-1 py-0.5 rounded-[3px] bg-purple-600 text-[7px] font-bold text-white uppercase">NEW</span>
+                          <span className="px-1 py-0.5 rounded-[3px] bg-green-600 text-[6px] font-bold text-white uppercase">PRO</span>
                         )}
                       </div>
-                      <p className="text-gray-500 text-[10px] mt-0.5 line-clamp-1">
+                      <p className="text-gray-500 text-[9px] mt-0.5 line-clamp-1 italic">
                         {node.description}
                       </p>
                     </div>

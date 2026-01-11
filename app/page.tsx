@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Zap, Code2, Workflow, ArrowRight, CheckCircle, Layers, Rocket, Coins, FileCode } from "lucide-react"
+import { Zap, Code2, Workflow, ArrowRight, CheckCircle, Layers, Rocket, Coins, FileCode, Shield, RefreshCcw } from "lucide-react"
 
 export default function Home() {
   const containerVariants = {
@@ -27,7 +27,7 @@ export default function Home() {
   }
 
   return (
-    <div className="flex flex-col w-full overflow-x-hidden">
+    <div className="flex flex-col w-full overflow-x-hidden bg-black">
       {/* Hero Section 1: Main Introduction */}
       <section className="relative w-full overflow-hidden min-h-screen flex items-center">
         {/* Background gradient with green tones for BCH */}
@@ -71,7 +71,7 @@ export default function Home() {
           >
             <motion.div variants={itemVariants}>
               <span className="inline-block px-4 py-2 rounded-full bg-green-500/10 border border-green-500/20 text-green-300 text-sm font-medium mb-6">
-                ₿ Bitcoin Cash Smart Contracts
+                ₿ Bitcoin Cash Smart Contracts & Privacy
               </span>
             </motion.div>
 
@@ -79,102 +79,52 @@ export default function Home() {
               variants={itemVariants}
               className="text-5xl md:text-7xl font-bold tracking-tight text-white mb-6"
             >
-              Build BCH Contracts{" "}
+              Build Private BCH Flows{" "}
               <span className="bg-gradient-to-r from-green-300 to-emerald-500 bg-clip-text text-transparent">
-                Without Code
+                Instantly
               </span>
             </motion.h1>
 
             <motion.p variants={itemVariants} className="text-lg md:text-xl text-muted-foreground max-w-2xl mb-8">
-              CashLabs Flow is the visual platform for creating CashScript smart contracts and BCH transactions.
-              No coding experience required. Deploy in minutes.
+              The world's first visual platform for anonymizing Bitcoin Cash transactions.
+              Mix, Shuffle, and Split UTXOs with a powerful no-code interface.
             </motion.p>
 
             <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4">
-              <Button asChild size="lg" className="bg-green-500 hover:bg-green-600 text-white font-semibold">
-                <Link href="/build/contracts">
-                  Build Contracts
-                  <FileCode className="ml-2 h-4 w-4" />
+              <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 text-black font-bold shadow-[0_0_20px_rgba(34,197,94,0.3)]">
+                <Link href="/workflow/private-mixer">
+                  Launch Private Mixer
+                  <Shield className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button asChild size="lg" className="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold">
+              <Button asChild size="lg" variant="outline" className="border-gray-800 text-white hover:bg-white/5">
                 <Link href="/build/transactions">
-                  Build Transactions
-                  <Coins className="ml-2 h-4 w-4" />
+                  Custom Flow Builder
+                  <Zap className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </motion.div>
 
-            <motion.div variants={itemVariants} className="mt-4">
-              <Button asChild variant="outline" size="lg" className="border-green-500/30 text-green-300 hover:bg-green-500/10">
-                <Link href="/build/contracts/noob">
-                  🎮 Easy Mode (For Beginners)
-                </Link>
-              </Button>
+            <motion.div variants={itemVariants} className="mt-8 grid grid-cols-2 md:grid-cols-4 gap-4 opacity-50">
+              <div className="flex items-center gap-2 grayscale hover:grayscale-0 transition-all cursor-default">
+                <RefreshCcw className="w-4 h-4" /> <span className="text-[10px] font-bold uppercase tracking-widest">CoinJoin Ready</span>
+              </div>
+              <div className="flex items-center gap-2 grayscale hover:grayscale-0 transition-all cursor-default">
+                <Shield className="w-4 h-4" /> <span className="text-[10px] font-bold uppercase tracking-widest">Zero-Knowledge</span>
+              </div>
+              <div className="flex items-center gap-2 grayscale hover:grayscale-0 transition-all cursor-default">
+                <Workflow className="w-4 h-4" /> <span className="text-[10px] font-bold uppercase tracking-widest">Multi-Hop</span>
+              </div>
+              <div className="flex items-center gap-2 grayscale hover:grayscale-0 transition-all cursor-default">
+                <Rocket className="w-4 h-4" /> <span className="text-[10px] font-bold uppercase tracking-widest">Non-Custodial</span>
+              </div>
             </motion.div>
           </motion.div>
-        </div>
-      </section>
-
-      {/* Hero Section 2: How It Works */}
-      <section id="how-it-works" className="py-24 bg-background/50 w-full">
-        <div className="container px-4 mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">How CashLabs Works</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              Create powerful Bitcoin Cash smart contracts with an intuitive visual interface
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-3 gap-8 max-w-5xl mx-auto">
-            {[
-              {
-                step: "01",
-                title: "Drag Components",
-                description: "Select from pre-built CashScript components and drag them onto your canvas.",
-                icon: Layers,
-              },
-              {
-                step: "02",
-                title: "Configure Logic",
-                description: "Set parameters, conditions, and spending rules using the visual editor.",
-                icon: Workflow,
-              },
-              {
-                step: "03",
-                title: "Deploy to BCH",
-                description: "Generate CashScript code and deploy your contract to Bitcoin Cash.",
-                icon: Rocket,
-              },
-            ].map((item, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: index * 0.2 }}
-                className="relative"
-              >
-                <div className="flex flex-col h-full p-8 rounded-2xl bg-card border border-border hover:border-green-500/50 transition-colors">
-                  <div className="text-5xl font-bold text-green-500/20 mb-4">{item.step}</div>
-                  <item.icon className="h-8 w-8 text-green-400 mb-4" />
-                  <h3 className="text-xl font-bold text-white mb-3">{item.title}</h3>
-                  <p className="text-muted-foreground">{item.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
         </div>
       </section>
 
       {/* Feature Section: What You Can Build */}
-      <section className="py-24 bg-gradient-to-b from-background to-green-900/10 w-full">
+      <section className="py-24 bg-gradient-to-b from-background to-green-900/10 w-full border-t border-gray-900">
         <div className="container px-4 mx-auto">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -183,43 +133,49 @@ export default function Home() {
             transition={{ duration: 0.8 }}
             className="text-center mb-16"
           >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">What You Can Build</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              CashLabs supports the full power of Bitcoin Cash and CashScript
+            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4 italic tracking-tighter">THE PRIVACY STACK</h2>
+            <p className="text-lg text-muted-foreground max-w-2xl mx-auto italic underline decoration-green-500/50">
+              Advanced UTXO management for untraceable Bitcoin Cash transactions.
             </p>
           </motion.div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
             {[
               {
-                title: "BCH Transactions",
-                description: "Send and receive Bitcoin Cash with visual flow building",
+                title: "Transaction Mixing",
+                description: "Collaborative mixing rounds to increase the anonymity set of your BCH.",
                 link: "/build/transactions",
+                icon: RefreshCcw
               },
               {
-                title: "CashTokens",
-                description: "Create and transfer fungible tokens and NFTs on BCH",
+                title: "UTXO Splitting",
+                description: "Break large inputs into many smaller fingerprints to break deterministic links.",
                 link: "/build/transactions",
+                icon: Layers
               },
               {
-                title: "Escrow Contracts",
-                description: "Build trustless 2-of-3 multisig escrow solutions",
-                link: "/build/contracts",
-              },
-              {
-                title: "Time-Locked Vaults",
-                description: "Create contracts with time-based spending conditions",
-                link: "/build/contracts",
-              },
-              {
-                title: "OP_RETURN Data",
-                description: "Store messages and data permanently on-chain",
+                title: "Output Shuffling",
+                description: "Randomize the order of outputs to defeat chain analysis software.",
                 link: "/build/transactions",
+                icon: Shield
               },
               {
-                title: "Custom Contracts",
-                description: "Build any CashScript contract with visual blocks",
+                title: "Smart Contracts",
+                description: "Build escrow and time-locked vaults with no coding required.",
                 link: "/build/contracts",
+                icon: FileCode
+              },
+              {
+                title: "CashTokens (NFTs)",
+                description: "Launch private NFT collections with embedded identity verification.",
+                link: "/build/transactions",
+                icon: Coins
+              },
+              {
+                title: "Stealth Flows",
+                description: "Chain multiple transactions over several days for maximum entropy.",
+                link: "/build/transactions",
+                icon: Zap
               },
             ].map((item, index) => (
               <motion.div
@@ -229,109 +185,18 @@ export default function Home() {
                 viewport={{ once: true }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <Link href={item.link} className="block h-full">
-                  <div className="p-6 rounded-xl bg-card border border-border hover:border-green-500/50 transition-all hover:scale-105 h-full">
-                    <h3 className="text-lg font-bold text-white mb-2">{item.title}</h3>
-                    <p className="text-muted-foreground text-sm">{item.description}</p>
+                <Link href={item.link} className="block h-full group">
+                  <div className="p-8 rounded-2xl bg-black border border-gray-900 group-hover:border-green-500/50 transition-all group-hover:scale-105 h-full relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-100 transition-opacity">
+                      <item.icon className="w-12 h-12 text-green-500" />
+                    </div>
+                    <h3 className="text-xl font-bold text-white mb-2">{item.title}</h3>
+                    <p className="text-muted-foreground text-sm leading-relaxed">{item.description}</p>
                   </div>
                 </Link>
               </motion.div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* Hero Section 3: Key Features & Benefits */}
-      <section className="py-24 bg-background w-full">
-        <div className="container px-4 mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-4">Why Choose CashLabs?</h2>
-            <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-              The easiest way to build and deploy on Bitcoin Cash
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
-            {[
-              {
-                icon: Code2,
-                title: "No Code Required",
-                description:
-                  "Build complex CashScript contracts without writing code. Our visual editor handles all the complexity.",
-              },
-              {
-                icon: Zap,
-                title: "Powered by CashScript",
-                description: "Generates production-ready CashScript code that you can audit, modify, and deploy.",
-              },
-              {
-                icon: CheckCircle,
-                title: "Low Fees",
-                description:
-                  "Bitcoin Cash has some of the lowest transaction fees in crypto. Deploy contracts for pennies.",
-              },
-              {
-                icon: Workflow,
-                title: "Full CashToken Support",
-                description:
-                  "Create fungible tokens and NFTs natively on BCH with CashTokens support.",
-              },
-            ].map((feature, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ duration: 0.8, delay: index * 0.1 }}
-                className="p-8 rounded-2xl bg-card border border-border hover:border-green-500/50 transition-colors group"
-              >
-                <div className="p-3 rounded-lg bg-gradient-to-br from-green-500/10 to-emerald-600/10 w-fit mb-4 group-hover:from-green-500/20 group-hover:to-emerald-600/20 transition-colors">
-                  <feature.icon className="h-6 w-6 text-green-400" />
-                </div>
-                <h3 className="text-xl font-bold text-white mb-3">{feature.title}</h3>
-                <p className="text-muted-foreground">{feature.description}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-24 bg-gradient-to-r from-green-900/50 to-emerald-800/50 w-full">
-        <div className="container px-4 mx-auto">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="flex flex-col items-center text-center max-w-2xl mx-auto"
-          >
-            <h2 className="text-4xl md:text-5xl font-bold text-white mb-6">Ready to Build on BCH?</h2>
-            <p className="text-lg text-muted-foreground mb-8">
-              Start creating Bitcoin Cash smart contracts and transactions today. No experience necessary.
-            </p>
-
-            <div className="flex flex-col sm:flex-row gap-4">
-              <Button asChild size="lg" className="bg-green-500 hover:bg-green-600 text-white font-semibold">
-                <Link href="/build/contracts">
-                  Start Building Contracts
-                  <ArrowRight className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-              <Button asChild size="lg" className="bg-white hover:bg-gray-100 text-black font-semibold">
-                <Link href="/build/transactions">
-                  Build Transactions
-                  <Coins className="ml-2 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </motion.div>
         </div>
       </section>
     </div>
