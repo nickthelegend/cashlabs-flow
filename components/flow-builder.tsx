@@ -4,8 +4,6 @@ import type React from "react"
 import { useState, useEffect, useCallback } from "react"
 import {
   ReactFlow,
-  useNodesState,
-  useEdgesState,
   addEdge,
   MiniMap,
   Controls,
@@ -13,6 +11,10 @@ import {
   type NodeTypes,
   type Node,
   type Connection,
+  type Edge,
+  type OnNodesChange,
+  type OnEdgesChange,
+  type OnConnect,
 } from "@xyflow/react"
 import "@xyflow/react/dist/style.css"
 import { NodeSidebar } from "./node-sidebar"
@@ -29,7 +31,6 @@ import {
   ExecuteTxnNode,
 } from "./nodes/bch-nodes"
 import { NodePropertiesPanel } from "./node-properties-panel"
-import { type Edge } from "@xyflow/react"
 import {
   Plus,
   MousePointer2,
@@ -44,13 +45,19 @@ import {
   PlusSquare,
   ArrowRightLeft,
   FileText,
-  Zap
+  Zap,
+  Trash2
 } from "lucide-react"
 
 interface FlowBuilderProps {
   type: "transaction"
-  onFlowChange?: (nodes: Node[], edges: Edge[]) => void
+  nodes: Node[]
+  edges: Edge[]
+  onNodesChange: OnNodesChange
+  onEdgesChange: OnEdgesChange
+  onConnect: OnConnect
   onNodeSelect?: (node: Node | null) => void
+  onCloseOverlays?: () => void
 }
 
 const nodeData = [
@@ -78,18 +85,20 @@ const nodeTypes: NodeTypes = {
   executeTxn: ExecuteTxnNode,
 }
 
-export function FlowBuilder({ type, onFlowChange, onNodeSelect }: FlowBuilderProps) {
-  const [nodes, setNodes, onNodesChange] = useNodesState<Node>([])
-  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge>([])
+export function FlowBuilder({
+  type,
+  nodes,
+  edges,
+  onNodesChange,
+  onEdgesChange,
+  onConnect,
+  onNodeSelect,
+  onCloseOverlays
+}: FlowBuilderProps) {
   const [reactFlowInstance, setReactFlowInstance] = useState<any>(null)
   const [selectedNode, setSelectedNode] = useState<Node | null>(null)
   const [isSidebarOpen, setIsSidebarOpen] = useState(true)
-  const [contextMenu, setContextMenu] = useState<{ x: number, y: number } | null>(null)
-
-  const onConnect = useCallback(
-    (params: Connection) => setEdges((eds) => addEdge({ ...params, animated: true }, eds)),
-    [setEdges],
-  )
+  const [contextMenu, setContextMenu] = useState<{ x: number, y: number, nodeId?: string } | null>(null)
 
   const onDragOver = useCallback((event: React.DragEvent) => {
     event.preventDefault()
@@ -107,7 +116,6 @@ export function FlowBuilder({ type, onFlowChange, onNodeSelect }: FlowBuilderPro
         return
       }
 
-      // Get the position relative to the ReactFlow canvas
       const position = reactFlowInstance?.screenToFlowPosition({
         x: event.clientX,
         y: event.clientY,
@@ -116,18 +124,14 @@ export function FlowBuilder({ type, onFlowChange, onNodeSelect }: FlowBuilderPro
       if (!position) return
 
       let config = getDefaultConfig(nodeType)
-      if (nodeType === "account") {
-        const savedWallet = localStorage.getItem("bch-wallet")
-        if (savedWallet) {
-          try {
-            const parsedWallet = JSON.parse(savedWallet)
-            if (parsedWallet && parsedWallet.privateKeyWif) {
-              config = { ...config, wif: parsedWallet.privateKeyWif }
-            }
-          } catch (error) {
-            console.error("Error parsing wallet from localStorage:", error)
+      const savedWallet = localStorage.getItem("bch-wallet")
+      if (nodeType === "account" && savedWallet) {
+        try {
+          const parsedWallet = JSON.parse(savedWallet)
+          if (parsedWallet?.privateKeyWif) {
+            config = { ...config, wif: parsedWallet.privateKeyWif }
           }
-        }
+        } catch (e) { }
       }
 
       const newNode: Node = {
@@ -141,21 +145,23 @@ export function FlowBuilder({ type, onFlowChange, onNodeSelect }: FlowBuilderPro
         },
       }
 
-      setNodes((nds) => nds.concat(newNode))
+      onNodesChange([{ type: 'add', item: newNode }])
     },
-    [reactFlowInstance, setNodes],
+    [reactFlowInstance, onNodesChange],
   )
 
   const onNodeClick = useCallback((_event: React.MouseEvent, node: Node) => {
     setSelectedNode(node)
     onNodeSelect?.(node)
-  }, [onNodeSelect])
+    setIsSidebarOpen(false)
+    onCloseOverlays?.()
+  }, [onNodeSelect, onCloseOverlays])
 
   const onUpdateNode = useCallback(
     (nodeId: string, data: any) => {
-      setNodes((nds) => nds.map((node) => (node.id === nodeId ? { ...node, data } : node)))
+      onNodesChange([{ type: 'replace', id: nodeId, item: { ...nodes.find(n => n.id === nodeId), data } as Node }])
     },
-    [setNodes],
+    [nodes, onNodesChange],
   )
 
   const onPaneContextMenu = useCallback((event: any) => {
@@ -163,9 +169,23 @@ export function FlowBuilder({ type, onFlowChange, onNodeSelect }: FlowBuilderPro
     setContextMenu({ x: event.clientX, y: event.clientY })
   }, [])
 
+  const onNodeContextMenu = useCallback((event: any, node: Node) => {
+    event.preventDefault()
+    setContextMenu({ x: event.clientX, y: event.clientY, nodeId: node.id })
+  }, [])
+
   const onPaneClick = useCallback((event: any) => {
     setContextMenu(null)
   }, [])
+
+  const deleteNode = useCallback((nodeId: string) => {
+    onNodesChange([{ type: 'remove', id: nodeId }])
+    if (selectedNode?.id === nodeId) {
+      setSelectedNode(null)
+      onNodeSelect?.(null)
+    }
+    setContextMenu(null)
+  }, [selectedNode, onNodesChange, onNodeSelect])
 
   const addNodeAtPosition = useCallback((type: string, x: number, y: number) => {
     const position = reactFlowInstance?.screenToFlowPosition({ x, y })
@@ -182,46 +202,9 @@ export function FlowBuilder({ type, onFlowChange, onNodeSelect }: FlowBuilderPro
         config: getDefaultConfig(type),
       },
     }
-    setNodes((nds) => nds.concat(newNode))
+    onNodesChange([{ type: 'add', item: newNode }])
     setContextMenu(null)
-  }, [reactFlowInstance, setNodes])
-
-
-
-  // Initialize with BCH example nodes
-  useEffect(() => {
-    const transactionNodes: Node[] = [
-      {
-        id: "tx-example-1",
-        type: "account",
-        position: { x: 400, y: 100 },
-        data: {
-          label: "BCH WALLET",
-          nodeType: "account",
-          config: { wif: null },
-        },
-      },
-      {
-        id: "tx-example-2",
-        type: "payment",
-        position: { x: 650, y: 100 },
-        data: {
-          label: "SEND BCH",
-          nodeType: "payment",
-          config: { amount: 0.001, receiver: null },
-        },
-      },
-    ]
-
-    const initialNodes = transactionNodes
-    setNodes(initialNodes)
-  }, [type, setNodes])
-
-  useEffect(() => {
-    if (onFlowChange) {
-      onFlowChange(nodes, edges)
-    }
-  }, [nodes, edges, onFlowChange])
+  }, [reactFlowInstance, onNodesChange])
 
   return (
     <div className="h-full w-full relative flex overflow-hidden bg-black">
@@ -271,8 +254,6 @@ export function FlowBuilder({ type, onFlowChange, onNodeSelect }: FlowBuilderPro
           onNodeClick={(nodeType) => {
             const viewport = reactFlowInstance?.getViewport()
             if (viewport) {
-              const x = (window.innerWidth / 2 - viewport.x) / viewport.zoom
-              const y = (window.innerHeight / 2 - viewport.y) / viewport.zoom
               addNodeAtPosition(nodeType, window.innerWidth / 2, window.innerHeight / 2)
             }
           }}
@@ -290,6 +271,7 @@ export function FlowBuilder({ type, onFlowChange, onNodeSelect }: FlowBuilderPro
           onDragOver={onDragOver}
           onNodeClick={onNodeClick}
           onPaneContextMenu={onPaneContextMenu}
+          onNodeContextMenu={onNodeContextMenu}
           onPaneClick={onPaneClick}
           onInit={setReactFlowInstance}
           nodeTypes={nodeTypes}
@@ -329,24 +311,46 @@ export function FlowBuilder({ type, onFlowChange, onNodeSelect }: FlowBuilderPro
             className="fixed z-[100] w-64 bg-[#111111] border border-[#1a1a1a] rounded-xl shadow-2xl overflow-hidden backdrop-blur-xl animate-in fade-in zoom-in duration-200"
             style={{ left: contextMenu.x, top: contextMenu.y }}
           >
-            <div className="p-3 border-b border-[#1a1a1a] flex items-center justify-between bg-[#161616]">
-              <span className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Connect Node</span>
-              <Plus className="w-3 h-3 text-gray-500" />
-            </div>
-            <div className="p-1">
-              {nodeData.map((node) => (
-                <button
-                  key={node.id}
-                  className="w-full flex items-center gap-3 p-2.5 hover:bg-green-500/10 rounded-lg group transition-all text-left"
-                  onClick={() => addNodeAtPosition(node.id, contextMenu.x, contextMenu.y)}
-                >
-                  <div className="w-8 h-8 rounded-lg bg-[#1a1a1a] flex items-center justify-center group-hover:scale-110 group-hover:bg-green-500/20 transition-all">
-                    <node.icon className={`w-4 h-4 ${node.color}`} />
-                  </div>
-                  <span className="text-gray-300 text-sm font-medium group-hover:text-white">{node.label}</span>
-                </button>
-              ))}
-            </div>
+            {contextMenu.nodeId ? (
+              <>
+                <div className="p-3 border-b border-[#1a1a1a] flex items-center justify-between bg-[#161616]">
+                  <span className="text-red-400 text-[10px] font-bold uppercase tracking-widest">Node Actions</span>
+                  <Trash2 className="w-3 h-3 text-red-400" />
+                </div>
+                <div className="p-1">
+                  <button
+                    className="w-full flex items-center gap-3 p-2.5 hover:bg-red-500/10 rounded-lg group transition-all text-left"
+                    onClick={() => deleteNode(contextMenu.nodeId!)}
+                  >
+                    <div className="w-8 h-8 rounded-lg bg-red-500/10 flex items-center justify-center group-hover:bg-red-500/20 transition-all">
+                      <Trash2 className="w-4 h-4 text-red-400" />
+                    </div>
+                    <span className="text-red-400 text-sm font-medium">Delete Node</span>
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="p-3 border-b border-[#1a1a1a] flex items-center justify-between bg-[#161616]">
+                  <span className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Connect Node</span>
+                  <Plus className="w-3 h-3 text-gray-500" />
+                </div>
+                <div className="p-1">
+                  {nodeData.map((node) => (
+                    <button
+                      key={node.id}
+                      className="w-full flex items-center gap-3 p-2.5 hover:bg-green-500/10 rounded-lg group transition-all text-left"
+                      onClick={() => addNodeAtPosition(node.id, contextMenu.x, contextMenu.y)}
+                    >
+                      <div className="w-8 h-8 rounded-lg bg-[#1a1a1a] flex items-center justify-center group-hover:scale-110 group-hover:bg-green-500/20 transition-all">
+                        <node.icon className={`w-4 h-4 ${node.color}`} />
+                      </div>
+                      <span className="text-gray-300 text-sm font-medium group-hover:text-white">{node.label}</span>
+                    </button>
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
       </div>
