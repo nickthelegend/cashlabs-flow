@@ -34,7 +34,10 @@ import {
   TokenBurnNode,
   PriceNode,
   DelayNode,
-  PrepareWalletNode
+  PrepareWalletNode,
+  ImageUploadNode,
+  AssetListNode,
+  TokenHoldersNode
 } from "./nodes/bch-nodes"
 import { NodePropertiesPanel } from "./node-properties-panel"
 import {
@@ -57,7 +60,11 @@ import {
   Clock3,
   Flame,
   TrendingUp,
-  Hammer
+  Hammer,
+  Image as ImageIcon,
+  Users,
+  List,
+  Monitor
 } from "lucide-react"
 
 interface FlowBuilderProps {
@@ -76,13 +83,13 @@ const nodeData = [
   { id: "prepareWallet", label: "PREPARE WALLET", icon: Hammer, color: "text-orange-400" },
   { id: "payment", label: "SEND BCH", icon: Send, color: "text-green-400" },
   { id: "multiSend", label: "MULTI-SEND", icon: UserPlus, color: "text-emerald-400" },
-  { id: "tokenCreate", label: "CREATE TOKEN", icon: PlusSquare, color: "text-yellow-400" },
-  { id: "tokenMint", label: "MINT TOKEN", icon: PlusSquare, color: "text-amber-400" },
+  { id: "tokenCreate", label: "CREATE TOKEN (NFT)", icon: PlusSquare, color: "text-yellow-400" },
+  { id: "imageUpload", label: "NFT IMAGE", icon: ImageIcon, color: "text-pink-400" },
+  { id: "assetList", label: "FETCH ASSETS", icon: List, color: "text-cyan-400" },
+  { id: "tokenHolders", label: "TOKEN HOLDERS", icon: Users, color: "text-indigo-400" },
   { id: "tokenTransfer", label: "TRANSFER TOKEN", icon: ArrowRightLeft, color: "text-purple-400" },
-  { id: "tokenBurn", label: "BURN TOKEN", icon: Flame, color: "text-rose-400" },
   { id: "opReturn", label: "OP_RETURN", icon: FileText, color: "text-orange-400" },
-  { id: "priceFeed", label: "PRICE FEED", icon: TrendingUp, color: "text-blue-400" },
-  { id: "delay", label: "DELAY", icon: Clock3, color: "text-indigo-400" },
+  { id: "output", label: "OUTPUT (HOLDINGS)", icon: Monitor, color: "text-gray-400" },
   { id: "executeTxn", label: "EXECUTE", icon: Zap, color: "text-red-400" },
 ]
 
@@ -106,6 +113,9 @@ const nodeTypes: NodeTypes = {
   tokenBurn: TokenBurnNode,
   priceFeed: PriceNode,
   delay: DelayNode,
+  imageUpload: ImageUploadNode,
+  assetList: AssetListNode,
+  tokenHolders: TokenHoldersNode,
 }
 
 export function FlowBuilder({
@@ -358,7 +368,7 @@ export function FlowBuilder({
                   <span className="text-gray-400 text-[10px] font-bold uppercase tracking-widest">Connect Node</span>
                   <Plus className="w-3 h-3 text-gray-500" />
                 </div>
-                <div className="p-1">
+                <div className="p-1 max-h-[450px] overflow-y-auto custom-scrollbar">
                   {nodeData.map((node) => (
                     <button
                       key={node.id}
@@ -406,6 +416,9 @@ function getDefaultConfig(nodeType: string) {
     condition: { condition: "balance", operator: ">", value: 0 },
     output: { format: "JSON" },
     executeTxn: { network: "TestNet" },
+    imageUpload: { image: null },
+    assetList: { wallet: null },
+    tokenHolders: { tokenId: null },
   }
   return configs[nodeType] || {}
 }

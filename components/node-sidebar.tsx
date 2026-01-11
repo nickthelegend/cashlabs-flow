@@ -21,7 +21,11 @@ import {
   Clock3,
   Flame,
   UserPlus,
-  Hammer
+  Hammer,
+  Image as ImageIcon,
+  Users,
+  List,
+  Download
 } from "lucide-react"
 
 interface NodeSidebarProps {
@@ -58,112 +62,98 @@ const bchNodes = [
     color: "text-green-400",
     bg: "bg-green-400/10",
     category: "Transaction",
-    isNew: false,
+  },
+  {
+    id: "multiSend",
+    label: "MULTI-SEND",
+    description: "Send BCH to multiple addresses at once",
+    icon: UserPlus,
+    color: "text-emerald-400",
+    bg: "bg-emerald-400/10",
+    category: "Transaction",
+    isNew: true,
   },
   {
     id: "tokenCreate",
-    label: "CREATE TOKEN",
-    description: "Launch a new CashToken (Fungible or NFT)",
+    label: "CREATE TOKEN (NFT)",
+    description: "Create a new CashToken or NFT collection",
     icon: PlusSquare,
     color: "text-yellow-400",
     bg: "bg-yellow-400/10",
-    category: "CashTokens",
+    category: "Token",
+  },
+  {
+    id: "imageUpload",
+    label: "NFT IMAGE",
+    description: "Upload and preview NFT artwork",
+    icon: ImageIcon,
+    color: "text-pink-400",
+    bg: "bg-pink-400/10",
+    category: "Token",
+    isNew: true,
+  },
+  {
+    id: "tokenMint",
+    label: "MINT TOKEN",
+    description: "Mint additional supply of an existing token",
+    icon: PlusSquare,
+    color: "text-amber-400",
+    bg: "bg-amber-400/10",
+    category: "Token",
     isNew: true,
   },
   {
     id: "tokenTransfer",
     label: "TRANSFER TOKEN",
-    description: "Transfer existing CashTokens",
+    description: "Send CashTokens to another address",
     icon: ArrowRightLeft,
     color: "text-purple-400",
     bg: "bg-purple-400/10",
-    category: "CashTokens",
-    isNew: false,
-  },
-  {
-    id: "opReturn",
-    label: "OP_RETURN",
-    description: "Embed data or messages into the blockchain",
-    icon: FileText,
-    color: "text-orange-400",
-    bg: "bg-orange-400/10",
-    category: "Transaction",
-    isNew: false,
-  },
-  {
-    id: "getBalance",
-    label: "GET BALANCE",
-    description: "Fetch the current balance of a wallet",
-    icon: Coins,
-    color: "text-cyan-400",
-    bg: "bg-cyan-400/10",
-    category: "Utility",
-    isNew: false,
-  },
-  {
-    id: "waitForBalance",
-    label: "WAIT FOR BALANCE",
-    description: "Pause flow until a specific balance is reached",
-    icon: Clock,
-    color: "text-violet-400",
-    bg: "bg-violet-400/10",
-    category: "Utility",
-    isNew: false,
-  },
-  {
-    id: "condition",
-    label: "CONDITION",
-    description: "Add if/else branching logic to your flow",
-    icon: GitBranch,
-    color: "text-teal-400",
-    bg: "bg-teal-400/10",
-    category: "Logic",
-    isNew: false,
-  },
-  {
-    id: "executeTxn",
-    label: "EXECUTE",
-    description: "Finalize and broadcast the transaction",
-    icon: Zap,
-    color: "text-red-400",
-    bg: "bg-red-400/10",
-    category: "Core",
-    isNew: true,
-  },
-  {
-    id: "multiSend",
-    label: "MULTI-SEND",
-    description: "Send BCH to multiple recipients in one transaction",
-    icon: UserPlus,
-    color: "text-emerald-400",
-    bg: "bg-emerald-400/10",
-    category: "Transaction",
-    isNew: false,
-  },
-  {
-    id: "tokenMint",
-    label: "MINT TOKEN",
-    description: "Mint additional supply for an existing CashToken",
-    icon: PlusSquare,
-    color: "text-amber-400",
-    bg: "bg-amber-400/10",
-    category: "CashTokens",
-    isNew: false,
+    category: "Token",
   },
   {
     id: "tokenBurn",
     label: "BURN TOKEN",
-    description: "Permanently destroy CashTokens from your wallet",
+    description: "Permanently destroy CashTokens",
     icon: Flame,
     color: "text-rose-400",
     bg: "bg-rose-400/10",
-    category: "CashTokens",
-    isNew: false,
+    category: "Token",
+    isNew: true,
+  },
+  {
+    id: "assetList",
+    label: "FETCH ASSETS",
+    description: "Get all tokens held in the wallet",
+    icon: List,
+    color: "text-cyan-400",
+    bg: "bg-cyan-400/10",
+    category: "Analytics",
+    isNew: true,
+  },
+  {
+    id: "tokenHolders",
+    label: "TOKEN HOLDERS",
+    description: "Fetch holders list and export to CSV",
+    icon: Users,
+    color: "text-indigo-400",
+    bg: "bg-indigo-400/10",
+    category: "Analytics",
+    isNew: true,
+  },
+  {
+    id: "opReturn",
+    label: "OP_RETURN",
+    description: "Embed data permanently into the blockchain",
+    icon: FileText,
+    color: "text-orange-400",
+    bg: "bg-orange-400/10",
+    category: "Core",
   },
   {
     id: "priceFeed",
     label: "PRICE FEED",
-    description: "Get real-time market price for BCH/USD",
+    description: "Get real-time BCH market prices",
     icon: TrendingUp,
     color: "text-blue-400",
     bg: "bg-blue-400/10",
@@ -173,22 +163,36 @@ const bchNodes = [
   {
     id: "delay",
     label: "DELAY",
-    description: "Add a timed pause in hours, minutes or seconds",
+    description: "Wait for a specified time between steps",
     icon: Clock3,
     color: "text-indigo-400",
     bg: "bg-indigo-400/10",
     category: "Utility",
-    isNew: false,
-  }
+    isNew: true,
+  },
+  {
+    id: "output",
+    label: "OUTPUT HOLDINGS",
+    description: "Show wallet holdings in a nice panel",
+    icon: Monitor,
+    color: "text-gray-400",
+    bg: "bg-gray-400/10",
+    category: "Utility",
+    isNew: true,
+  },
+  {
+    id: "executeTxn",
+    label: "EXECUTE",
+    description: "Broadcast the built transaction",
+    icon: Zap,
+    color: "text-red-400",
+    bg: "bg-red-400/10",
+    category: "Core",
+  },
 ]
 
 export function NodeSidebar({ type, onNodeClick }: NodeSidebarProps) {
   const [searchQuery, setSearchQuery] = useState("")
-
-  const filteredNodes = bchNodes.filter(node =>
-    node.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    node.description.toLowerCase().includes(searchQuery.toLowerCase())
-  )
 
   const onDragStart = (event: React.DragEvent, nodeType: string, nodeLabel: string) => {
     event.dataTransfer.setData("application/reactflow", nodeType)
@@ -196,13 +200,18 @@ export function NodeSidebar({ type, onNodeClick }: NodeSidebarProps) {
     event.dataTransfer.effectAllowed = "move"
   }
 
-  const groupedNodes = filteredNodes.reduce(
+  const nodes = bchNodes.filter(
+    (node) =>
+      node.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      node.category.toLowerCase().includes(searchQuery.toLowerCase()),
+  )
+
+  const groupedNodes = nodes.reduce(
     (acc, node) => {
-      const category = node.category
-      if (!acc[category]) {
-        acc[category] = []
+      if (!acc[node.category]) {
+        acc[node.category] = []
       }
-      acc[category].push(node)
+      acc[node.category].push(node)
       return acc
     },
     {} as Record<string, typeof bchNodes>,
@@ -268,16 +277,8 @@ export function NodeSidebar({ type, onNodeClick }: NodeSidebarProps) {
               </div>
             </div>
           ))}
-
-          {Object.keys(groupedNodes).length === 0 && (
-            <div className="py-20 text-center">
-              <Search className="w-8 h-8 text-gray-700 mx-auto mb-3" />
-              <p className="text-gray-500 text-sm">No tiles found for "{searchQuery}"</p>
-            </div>
-          )}
         </div>
       </ScrollArea>
     </div>
   )
 }
-
