@@ -13,7 +13,7 @@ const inter = Inter({ subsets: ["latin"] })
 
 function LayoutContent({ children }: { children: React.ReactNode }) {
   const pathname = usePathname()
-  const hiddenRoutes = pathname?.startsWith("/build")
+  const hiddenRoutes = pathname?.startsWith("/build") || pathname?.startsWith("/workflow")
 
   return (
     <div className="flex min-h-screen flex-col overflow-x-hidden">
