@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/button"
 import Link from "next/link"
 import { motion } from "framer-motion"
-import { Zap, Code2, Workflow, ArrowRight, CheckCircle, Layers, Rocket, Coins, FileCode, Shield, RefreshCcw } from "lucide-react"
+import { Zap, Code2, Workflow, ArrowRight, CheckCircle, Layers, Rocket, Coins, FileCode, Shield, RefreshCcw, Users, Lock } from "lucide-react"
 
 export default function Home() {
   const containerVariants = {
@@ -91,13 +91,13 @@ export default function Home() {
             </motion.p>
 
             <motion.div variants={itemVariants} className="flex flex-col sm:flex-row gap-4">
-              <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 text-black font-bold shadow-[0_0_20px_rgba(34,197,94,0.3)]">
-                <Link href="/workflow/private-mixer">
-                  Launch Private Mixer
+              <Button asChild size="lg" className="bg-green-600 hover:bg-green-700 text-black font-bold shadow-[0_0_20px_rgba(34,197,94,0.3)] h-14 px-8 rounded-2xl transition-all active:scale-95">
+                <Link href="/workflows">
+                  Launch Workflow Gallery
                   <Shield className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
-              <Button asChild size="lg" variant="outline" className="border-gray-800 text-white hover:bg-white/5">
+              <Button asChild size="lg" variant="outline" className="border-gray-800 text-white hover:bg-white/5 h-14 px-8 rounded-2xl">
                 <Link href="/build/transactions">
                   Custom Flow Builder
                   <Zap className="ml-2 h-4 w-4" />
@@ -120,6 +120,59 @@ export default function Home() {
               </div>
             </motion.div>
           </motion.div>
+        </div>
+      </section>
+
+      {/* Featured Workflows Section */}
+      <section className="py-24 bg-black w-full border-t border-gray-900 border-b">
+        <div className="container px-4 mx-auto">
+          <div className="flex flex-col md:flex-row md:items-end justify-between mb-12 gap-4">
+            <div>
+              <h2 className="text-3xl md:text-5xl font-bold text-white italic tracking-tighter uppercase">Featured Workflows</h2>
+              <p className="text-gray-500 mt-2 italic underline decoration-green-500/30">Plug-and-play Bitcoin Cash automation blueprints.</p>
+            </div>
+            <Link href="/workflows">
+              <Button variant="ghost" className="text-green-500 hover:text-green-400 hover:bg-green-500/10 h-12 rounded-xl">
+                View All Gallery <ArrowRight className="ml-2 w-4 h-4" />
+              </Button>
+            </Link>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {[
+              {
+                title: "Private Mixer Pro",
+                desc: "Anonymize UTXOs via multi-hop stealth flows.",
+                icon: Shield,
+                link: "/workflows",
+                color: "text-green-500"
+              },
+              {
+                title: "Bulk Airdrop",
+                desc: "Distribute tokens to 100+ addresses instantly.",
+                icon: Users,
+                link: "/workflows",
+                color: "text-blue-500"
+              },
+              {
+                title: "Stealth Pay",
+                desc: "Split payments across time to break links.",
+                icon: Lock,
+                link: "/workflows",
+                color: "text-purple-500"
+              }
+            ].map((wf, idx) => (
+              <Link href={wf.link} key={idx} className="group">
+                <div className="p-8 rounded-3xl bg-[#0a0a0a] border border-gray-900 group-hover:border-green-500/30 transition-all h-full relative overflow-hidden">
+                  <div className="p-3 bg-white/5 rounded-xl w-fit mb-6 group-hover:scale-110 transition-transform">
+                    <wf.icon className={`w-6 h-6 ${wf.color}`} />
+                  </div>
+                  <h3 className="text-xl font-bold text-white mb-2 italic tracking-tight uppercase">{wf.title}</h3>
+                  <p className="text-gray-500 text-sm leading-relaxed">{wf.desc}</p>
+                </div>
+              </Link>
+            ))}
+          </div>
         </div>
       </section>
 

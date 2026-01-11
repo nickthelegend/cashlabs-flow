@@ -13,6 +13,7 @@ export default function Nav() {
 
   const navLinks = [
     { href: "/", label: "Home" },
+    { href: "/workflows", label: "Gallery" },
     { href: "/build/transactions", label: "Build Transactions" },
     { href: "/build/contracts", label: "Build Contracts" },
     { href: "/build/contracts/noob", label: "🎮 Easy Mode" },
@@ -29,13 +30,15 @@ export default function Nav() {
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
       {/* Logo - CHANGE: Updated branding to Flow */}
-      <Link href="/" className="flex items-center gap-2 flex-shrink-0">
+      <Link href="/" className="flex items-center gap-3 flex-shrink-0">
         <motion.div
-          className="text-xl md:text-2xl font-bold bg-gradient-to-r from-gray-300 to-gray-500 bg-clip-text text-transparent"
           whileHover={{ scale: 1.05 }}
-          transition={{ type: "spring", stiffness: 400, damping: 10 }}
+          className="flex items-center gap-2"
         >
-          Flow
+          <img src="/logo.png" alt="Flow Logo" className="w-8 h-8 rounded-lg shadow-[0_0_15px_rgba(34,197,94,0.3)]" />
+          <span className="text-xl md:text-2xl font-bold bg-gradient-to-r from-white to-gray-500 bg-clip-text text-transparent italic tracking-tighter">
+            Flow
+          </span>
         </motion.div>
       </Link>
 
@@ -45,9 +48,8 @@ export default function Nav() {
           <Link
             key={link.href}
             href={link.href}
-            className={`text-sm font-medium transition-colors ${
-              isActive(link.href) ? "text-secondary" : "text-muted-foreground hover:text-secondary"
-            }`}
+            className={`text-sm font-medium transition-colors ${isActive(link.href) ? "text-secondary" : "text-muted-foreground hover:text-secondary"
+              }`}
           >
             {link.label}
           </Link>
@@ -57,29 +59,29 @@ export default function Nav() {
       {/* Right Section - Mobile Menu */}
       <div className="flex items-center gap-4">
         {/* Mobile Menu */
-        <div className="md:hidden">
-          <DropdownMenu open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
-            <DropdownMenuTrigger asChild>
-              <button className="p-2 hover:bg-muted rounded-lg transition-colors" aria-label="Toggle mobile menu">
-                {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
-              </button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-48">
-              {navLinks.map((link) => (
-                <DropdownMenuItem key={link.href} asChild>
-                  <Link
-                    href={link.href}
-                    className={`w-full cursor-pointer ${isActive(link.href) ? "bg-accent/10" : ""}`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {link.label}
-                  </Link>
-                </DropdownMenuItem>
-              ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </div>
-}
+          <div className="md:hidden">
+            <DropdownMenu open={isMobileMenuOpen} onOpenChange={setIsMobileMenuOpen}>
+              <DropdownMenuTrigger asChild>
+                <button className="p-2 hover:bg-muted rounded-lg transition-colors" aria-label="Toggle mobile menu">
+                  {isMobileMenuOpen ? <X className="h-5 w-5" /> : <Menu className="h-5 w-5" />}
+                </button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-48">
+                {navLinks.map((link) => (
+                  <DropdownMenuItem key={link.href} asChild>
+                    <Link
+                      href={link.href}
+                      className={`w-full cursor-pointer ${isActive(link.href) ? "bg-accent/10" : ""}`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {link.label}
+                    </Link>
+                  </DropdownMenuItem>
+                ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          </div>
+        }
       </div>
     </motion.nav>
   )
