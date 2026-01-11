@@ -120,7 +120,7 @@ export default function TransactionsPage() {
           logs += `[INFO] Initializing wallet from node: ${node.data.label}\n`
           const w = await TestNetWallet.fromWIF(wif)
           wallets.set(node.id, w)
-          const bal = await w.getBalance()
+          const bal: any = await w.getBalance()
           logs += `[INFO] Address: ${w.cashaddr} | Balance: ${bal.bch} BCH\n`
           setTerminalOutput(logs)
         }
@@ -140,47 +140,135 @@ export default function TransactionsPage() {
         return edge ? nodes.find(n => n.id === edge.source) : null
       }
 
-      // Pass 2: Execution
+      // Pass 2: Execution based on node types
       for (const node of nodes) {
-        if (node.type === 'payment') {
-          const config = (node.data as any).config
-          const { receiver, amount } = config
-          if (!receiver || !amount) {
-            logs += `[WARN] Skipping payment node: Missing receiver address or amount.\n`
-            continue
-          }
+        const config = (node.data as any).config || {}
+        const sourceNode = getSourceNode(node.id)
+        const walletNode = (sourceNode && wallets.get(sourceNode.id)) || defaultWallet
 
-          const sourceNode = getSourceNode(node.id)
-          const senderWallet = (sourceNode && wallets.get(sourceNode.id)) || defaultWallet
+        if (node.type === 'prepareWallet') {
+          logs += `[INFO] Preparing wallet for Token Genesis (creating vout=0 UTXO)...\n`
+          setTerminalOutput(logs)
+          try {
+            const txData = await walletNode.send([{ cashaddr: walletNode.cashaddr, value: 2000, unit: 'sat' }])
+            logs += `[SUCCESS] Wallet prepared! TxID: ${txData.txId}\n`
+            logs += `[INFO] You can now run your Token Genesis.\n`
+          } catch (e: any) {
+            logs += `[ERROR] Preparation failed: ${e.message}\n`
+          }
+          setTerminalOutput(logs)
+        }
+
+        if (node.type === 'payment') {
+          const { receiver, amount } = config
+          if (!receiver || !amount) continue
 
           logs += `[INFO] Sending ${amount} BCH to ${receiver}...\n`
           setTerminalOutput(logs)
 
           try {
-            const txData = await senderWallet.send([
-              { cashaddr: receiver, value: amount, unit: 'bch' }
-            ])
+            const txData = await walletNode.send([{ cashaddr: receiver, value: amount, unit: 'bch' }])
             logs += `[SUCCESS] Transaction sent! TxID: ${txData.txId}\n`
-            logs += `[INFO] Remaining balance: ${txData.balance.bch} BCH\n`
           } catch (e: any) {
             logs += `[ERROR] Send failed: ${e.message}\n`
           }
           setTerminalOutput(logs)
         }
 
+        if (node.type === 'multiSend') {
+          const { recipients } = config
+          if (!recipients) continue
+
+          const recipientList = recipients.split('\n').map((line: string) => {
+            const [addr, amt] = line.split(',').map(s => s.trim())
+            return { cashaddr: addr, value: parseFloat(amt), unit: 'bch' }
+          }).filter((r: any) => r.cashaddr && !isNaN(r.value))
+
+          if (recipientList.length === 0) continue
+
+          logs += `[INFO] Sending BCH to ${recipientList.length} recipients...\n`
+          setTerminalOutput(logs)
+
+          try {
+            const txData = await walletNode.send(recipientList)
+            logs += `[SUCCESS] Bulk Transaction sent! TxID: ${txData.txId}\n`
+          } catch (e: any) {
+            logs += `[ERROR] Multi-Send failed: ${e.message}\n`
+          }
+          setTerminalOutput(logs)
+        }
+
+        if (node.type === 'tokenCreate') {
+          const { name, symbol, amount, commitment, capability } = config
+          logs += `[INFO] Creating CashToken: ${name} (${symbol})...\n`
+          setTerminalOutput(logs)
+
+          try {
+            const txData = await walletNode.tokenGenesis({
+              cashaddr: walletNode.cashaddr,
+              amount: amount || 1000000,
+              value: 1000,
+              capability: capability || 'none',
+              commitment: commitment || ""
+            })
+            logs += `[SUCCESS] Token Created! Category ID: ${txData.tokenId}\n`
+            logs += `[INFO] TxID: ${txData.txId}\n`
+          } catch (e: any) {
+            if (e.message.includes('vout=0')) {
+              logs += `[ERROR] Token Genesis failed: ${e.message}\n`
+              logs += `[TIP] Use the "PREPARE WALLET" node before this node to fix this error!\n`
+            } else {
+              logs += `[ERROR] Token Genesis failed: ${e.message}\n`
+            }
+          }
+          setTerminalOutput(logs)
+        }
+
+        if (node.type === 'tokenMint') {
+          const { tokenId, amount, receiver } = config
+          if (!tokenId || !amount) continue
+          logs += `[INFO] Minting ${amount} tokens for category ${tokenId.substring(0, 10)}...\n`
+          setTerminalOutput(logs)
+
+          try {
+            const txData = await walletNode.tokenMint(tokenId, {
+              cashaddr: receiver || walletNode.cashaddr,
+              amount: BigInt(amount),
+              value: 1000
+            })
+            logs += `[SUCCESS] Tokens Minted! TxID: ${txData.txId}\n`
+          } catch (e: any) {
+            logs += `[ERROR] Minting failed: ${e.message}\n`
+          }
+          setTerminalOutput(logs)
+        }
+
+        if (node.type === 'tokenBurn') {
+          const { tokenId, amount } = config
+          if (!tokenId || !amount) continue
+          logs += `[INFO] Burning ${amount} tokens of category ${tokenId.substring(0, 10)}...\n`
+          setTerminalOutput(logs)
+
+          try {
+            const txData = await walletNode.tokenBurn({
+              tokenId: tokenId,
+              amount: BigInt(amount)
+            })
+            logs += `[SUCCESS] Tokens Burned! TxID: ${txData.txId}\n`
+          } catch (e: any) {
+            logs += `[ERROR] Burning failed: ${e.message}\n`
+          }
+          setTerminalOutput(logs)
+        }
+
         if (node.type === 'opReturn') {
-          const config = (node.data as any).config
           const { message } = config
           if (!message) continue
-
-          const sourceNode = getSourceNode(node.id)
-          const senderWallet = (sourceNode && wallets.get(sourceNode.id)) || defaultWallet
-
           logs += `[INFO] Sending OP_RETURN: "${message}"\n`
           setTerminalOutput(logs)
 
           try {
-            const txData = await senderWallet.send([["OP_RETURN", message]])
+            const txData = await walletNode.send([["OP_RETURN", message]])
             logs += `[SUCCESS] Sent! TxID: ${txData.txId}\n`
           } catch (e: any) {
             logs += `[ERROR] OP_RETURN failed: ${e.message}\n`
@@ -188,35 +276,9 @@ export default function TransactionsPage() {
           setTerminalOutput(logs)
         }
 
-        if (node.type === 'getBalance') {
-          const sourceNode = getSourceNode(node.id)
-          const walletNode = (sourceNode && wallets.get(sourceNode.id)) || defaultWallet
-          logs += `[INFO] Fetching balance for ${walletNode.cashaddr.substring(0, 15)}...\n`
-          const bal = await walletNode.getBalance()
-          logs += `[INFO] Balance: ${bal.bch} BCH ($${bal.usd?.toFixed(2)})\n`
-          setTerminalOutput(logs)
-        }
-
-        if (node.type === 'waitForBalance') {
-          const config = (node.data as any).config
-          const target = config.targetBalance || 0.0001
-          const sourceNode = getSourceNode(node.id)
-          const walletNode = (sourceNode && wallets.get(sourceNode.id)) || defaultWallet
-          logs += `[INFO] Waiting for balance to reach ${target} BCH...\n`
-          setTerminalOutput(logs)
-          const bal = await walletNode.waitForBalance(target, 'bch')
-          logs += `[SUCCESS] Target reached! New balance: ${bal}\n`
-          setTerminalOutput(logs)
-        }
-
         if (node.type === 'tokenTransfer') {
-          const config = (node.data as any).config
           const { tokenId, amount, receiver } = config
           if (!tokenId || !amount || !receiver) continue
-
-          const sourceNode = getSourceNode(node.id)
-          const walletNode = (sourceNode && wallets.get(sourceNode.id)) || defaultWallet
-
           logs += `[INFO] Transferring ${amount} tokens to ${receiver}...\n`
           setTerminalOutput(logs)
 
@@ -229,6 +291,38 @@ export default function TransactionsPage() {
           } catch (e: any) {
             logs += `[ERROR] Token transfer failed: ${e.message}\n`
           }
+          setTerminalOutput(logs)
+        }
+
+        if (node.type === 'getBalance') {
+          logs += `[INFO] Fetching balance for ${walletNode.cashaddr.substring(0, 15)}...\n`
+          const bal = await walletNode.getBalance()
+          logs += `[INFO] Balance: ${bal.bch} BCH ($${bal.usd?.toFixed(2)})\n`
+          setTerminalOutput(logs)
+        }
+
+        if (node.type === 'priceFeed') {
+          logs += `[INFO] Fetching current BCH market price...\n`
+          const rate = await walletNode.getUsdRate()
+          logs += `[INFO] Current Price: $${rate.toFixed(2)} USD / BCH\n`
+          setTerminalOutput(logs)
+        }
+
+        if (node.type === 'delay') {
+          const seconds = config.seconds || 5
+          logs += `[WAIT] Pausing flow for ${seconds} seconds...\n`
+          setTerminalOutput(logs)
+          await new Promise(resolve => setTimeout(resolve, seconds * 1000))
+          logs += `[INFO] Resuming flow.\n`
+          setTerminalOutput(logs)
+        }
+
+        if (node.type === 'waitForBalance') {
+          const target = config.targetBalance || 0.0001
+          logs += `[INFO] Waiting for balance to reach ${target} BCH...\n`
+          setTerminalOutput(logs)
+          const bal = await walletNode.waitForBalance(target, 'bch')
+          logs += `[SUCCESS] Target reached! New balance: ${bal}\n`
           setTerminalOutput(logs)
         }
       }

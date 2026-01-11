@@ -16,7 +16,12 @@ import {
   GitBranch,
   Monitor,
   Zap,
-  ChevronRight
+  ChevronRight,
+  TrendingUp,
+  Clock3,
+  Flame,
+  UserPlus,
+  Hammer
 } from "lucide-react"
 
 interface NodeSidebarProps {
@@ -32,6 +37,16 @@ const bchNodes = [
     icon: Wallet,
     color: "text-blue-400",
     bg: "bg-blue-400/10",
+    category: "Core",
+    isNew: true,
+  },
+  {
+    id: "prepareWallet",
+    label: "PREPARE WALLET",
+    description: "Fix 'vout=0' error for Token Genesis",
+    icon: Hammer,
+    color: "text-orange-400",
+    bg: "bg-orange-400/10",
     category: "Core",
     isNew: true,
   },
@@ -114,6 +129,56 @@ const bchNodes = [
     bg: "bg-red-400/10",
     category: "Core",
     isNew: true,
+  },
+  {
+    id: "multiSend",
+    label: "MULTI-SEND",
+    description: "Send BCH to multiple recipients in one transaction",
+    icon: UserPlus,
+    color: "text-emerald-400",
+    bg: "bg-emerald-400/10",
+    category: "Transaction",
+    isNew: false,
+  },
+  {
+    id: "tokenMint",
+    label: "MINT TOKEN",
+    description: "Mint additional supply for an existing CashToken",
+    icon: PlusSquare,
+    color: "text-amber-400",
+    bg: "bg-amber-400/10",
+    category: "CashTokens",
+    isNew: false,
+  },
+  {
+    id: "tokenBurn",
+    label: "BURN TOKEN",
+    description: "Permanently destroy CashTokens from your wallet",
+    icon: Flame,
+    color: "text-rose-400",
+    bg: "bg-rose-400/10",
+    category: "CashTokens",
+    isNew: false,
+  },
+  {
+    id: "priceFeed",
+    label: "PRICE FEED",
+    description: "Get real-time market price for BCH/USD",
+    icon: TrendingUp,
+    color: "text-blue-400",
+    bg: "bg-blue-400/10",
+    category: "Utility",
+    isNew: true,
+  },
+  {
+    id: "delay",
+    label: "DELAY",
+    description: "Add a timed pause in hours, minutes or seconds",
+    icon: Clock3,
+    color: "text-indigo-400",
+    bg: "bg-indigo-400/10",
+    category: "Utility",
+    isNew: false,
   }
 ]
 
@@ -144,21 +209,21 @@ export function NodeSidebar({ type, onNodeClick }: NodeSidebarProps) {
   )
 
   return (
-    <div className="w-[320px] h-full bg-[#0d0d0d] border-r border-[#1a1a1a] flex flex-col overflow-hidden shadow-2xl">
-      <div className="p-6 pb-4">
-        <h2 className="text-white text-lg font-bold flex items-center gap-2">
-          <Search className="w-4 h-4 text-green-500" />
+    <div className="w-[260px] h-full bg-[#0d0d0d] border-r border-[#1a1a1a] flex flex-col overflow-hidden shadow-2xl">
+      <div className="p-4 pb-2">
+        <h2 className="text-white text-base font-bold flex items-center gap-2">
+          <Search className="w-3.5 h-3.5 text-green-500" />
           Add Tile
         </h2>
-        <p className="text-gray-500 text-xs mt-1">Click or drag to add to your flow</p>
+        <p className="text-gray-500 text-[10px] mt-0.5">Click or drag to your flow</p>
       </div>
 
-      <div className="px-6 pb-4">
+      <div className="px-4 pb-3">
         <div className="relative group">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500 group-focus-within:text-green-500 transition-colors" />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-500 group-focus-within:text-green-500 transition-colors" />
           <Input
             placeholder="Search tiles..."
-            className="pl-9 bg-[#1a1a1a] border-none text-white placeholder:text-gray-600 focus-visible:ring-1 focus-visible:ring-green-500/50 h-10 rounded-lg text-sm"
+            className="pl-8 bg-[#1a1a1a] border-none text-white placeholder:text-gray-600 focus-visible:ring-1 focus-visible:ring-green-500/50 h-8 rounded-lg text-xs"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
           />
@@ -168,36 +233,36 @@ export function NodeSidebar({ type, onNodeClick }: NodeSidebarProps) {
       <ScrollArea className="flex-1">
         <div className="px-4 pb-6 space-y-6">
           {Object.entries(groupedNodes).map(([category, nodes]) => (
-            <div key={category} className="space-y-3">
-              <div className="px-2 flex items-center justify-between">
-                <h4 className="text-[10px] font-bold text-gray-500 uppercase tracking-[0.1em]">{category} ({nodes.length})</h4>
+            <div key={category} className="space-y-2">
+              <div className="px-2">
+                <h4 className="text-[9px] font-bold text-gray-600 uppercase tracking-[0.1em]">{category}</h4>
               </div>
               <div className="space-y-1">
                 {nodes.map((node) => (
                   <div
                     key={node.id}
-                    className="group relative flex items-start gap-4 p-3 rounded-xl hover:bg-[#1a1a1a] cursor-pointer transition-all duration-200 border border-transparent hover:border-[#2a2a2a]"
+                    className="group relative flex items-start gap-3 p-2 rounded-lg hover:bg-[#1a1a1a] cursor-pointer transition-all duration-200 border border-transparent hover:border-[#2a2a2a]"
                     draggable
                     onDragStart={(event) => onDragStart(event, node.id, node.label)}
                     onClick={() => onNodeClick?.(node.id)}
                   >
-                    <div className={`flex-shrink-0 w-10 h-10 ${node.bg} rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
-                      <node.icon className={`w-5 h-5 ${node.color}`} />
+                    <div className={`flex-shrink-0 w-8 h-8 ${node.bg} rounded-lg flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                      <node.icon className={`w-4 h-4 ${node.color}`} />
                     </div>
 
-                    <div className="flex-1 min-w-0 pr-6">
-                      <div className="flex items-center gap-2">
-                        <span className="text-white text-sm font-semibold truncate">{node.label}</span>
+                    <div className="flex-1 min-w-0 pr-4">
+                      <div className="flex items-center gap-1.5">
+                        <span className="text-white text-xs font-semibold truncate">{node.label}</span>
                         {node.isNew && (
-                          <span className="px-1.5 py-0.5 rounded-[4px] bg-purple-600 text-[8px] font-bold text-white uppercase tracking-wider">NEW</span>
+                          <span className="px-1 py-0.5 rounded-[3px] bg-purple-600 text-[7px] font-bold text-white uppercase">NEW</span>
                         )}
                       </div>
-                      <p className="text-gray-500 text-[11px] mt-0.5 line-clamp-2 leading-relaxed">
+                      <p className="text-gray-500 text-[10px] mt-0.5 line-clamp-1">
                         {node.description}
                       </p>
                     </div>
 
-                    <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-700 group-hover:text-green-500 transition-colors" />
+                    <ChevronRight className="absolute right-2 top-1/2 -translate-y-1/2 w-3 h-3 text-gray-700 group-hover:text-green-500 transition-colors" />
                   </div>
                 ))}
               </div>

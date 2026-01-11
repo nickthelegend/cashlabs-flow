@@ -11,21 +11,19 @@ export const generateCode = (nodes: Node[], edges: Edge[]): string => {
   code += `// Configuration\n`;
   code += `const NETWORK = 'testnet'; // Change to 'mainnet' for production\n\n`;
 
-  // Get stored wallet
+  // Get stored wallet from localStorage if available (for the generated script instructions)
   let storedWif = "";
-  let storedMnemonic = "";
   try {
-    const savedWallet = localStorage.getItem("bch-wallet");
-    if (savedWallet) {
-      const parsedWallet = JSON.parse(savedWallet);
-      if (parsedWallet && parsedWallet.privateKeyWif) {
-        storedWif = parsedWallet.privateKeyWif;
-        storedMnemonic = parsedWallet.mnemonic || "";
+    if (typeof window !== 'undefined') {
+      const savedWallet = localStorage.getItem("bch-wallet");
+      if (savedWallet) {
+        const parsedWallet = JSON.parse(savedWallet);
+        if (parsedWallet && parsedWallet.privateKeyWif) {
+          storedWif = parsedWallet.privateKeyWif;
+        }
       }
     }
-  } catch (error) {
-    console.error("Error parsing wallet from localStorage:", error);
-  }
+  } catch (error) { }
 
   const accountNodes = nodes.filter(node => node.type === 'account');
   accountNodes.forEach(node => {
@@ -47,111 +45,145 @@ export const generateCode = (nodes: Node[], edges: Edge[]): string => {
     code += `        console.log('Wallet address:', ${node.id.replace(/-/g, '_')}.cashaddr);\n\n`;
   });
 
-  // Get balance for account nodes
-  accountNodes.forEach(node => {
-    code += `        const ${node.id.replace(/-/g, '_')}_balance = await ${node.id.replace(/-/g, '_')}.getBalance();\n`;
-    code += `        console.log('Balance:', ${node.id.replace(/-/g, '_')}_balance.bch, 'BCH');\n\n`;
-  });
-
   // Topological sort to process nodes in correct order
   const sortedNodes = topologicalSort(nodes, edges);
 
   for (const node of sortedNodes) {
     const sourceEdges = edges.filter(edge => edge.target === node.id);
     const sourceNodes = sourceEdges.map(edge => nodes.find(n => n.id === edge.source));
+    const config = node.data.config || {};
+    const safeId = node.id.replace(/-/g, '_');
 
     switch (node.type) {
       case "payment": {
-        const senderNode = sourceNodes.find(n => n?.type === 'account');
+        const senderNode = sourceNodes.find(n => n?.type === 'account') || accountNodes[0];
         if (!senderNode) continue;
-        const receiver = node.data.config.receiver || "RECEIVER_BCH_ADDRESS";
-        const amount = node.data.config.amount || 0;
-        code += `        console.log('Creating payment: ${amount} BCH to ${receiver}');\n`;
-        code += `        const txn_${node.id.replace(/-/g, '_')} = await ${senderNode.id.replace(/-/g, '_')}.send([\n`;
-        code += `            {\n`;
-        code += `                cashaddr: "${receiver}",\n`;
-        code += `                value: ${amount},\n`;
-        code += `                unit: 'bch'\n`;
-        code += `            }\n`;
+        const receiver = config.receiver || "RECEIVER_BCH_ADDRESS";
+        const amount = config.amount || 0;
+        code += `        console.log('Sending ${amount} BCH to ${receiver}...');\n`;
+        code += `        const txn_${safeId} = await ${senderNode.id.replace(/-/g, '_')}.send([\n`;
+        code += `            { cashaddr: "${receiver}", value: ${amount}, unit: 'bch' }\n`;
         code += `        ]);\n`;
-        code += `        console.log('Transaction sent! TxID:', txn_${node.id.replace(/-/g, '_')}.txId);\n`;
-        code += `        console.log('New balance:', txn_${node.id.replace(/-/g, '_')}.balance.bch, 'BCH');\n\n`;
+        code += `        console.log('Sent! TxID:', txn_${safeId}.txId);\n\n`;
         break;
       }
+
+      case "multiSend": {
+        const senderNode = sourceNodes.find(n => n?.type === 'account') || accountNodes[0];
+        if (!senderNode) continue;
+        const recipients = config.recipients || "";
+        const recipientList = recipients.split('\n').map((line: string) => {
+          const [addr, amt] = line.split(',').map(s => s.trim());
+          if (!addr || !amt) return null;
+          return `{ cashaddr: "${addr}", value: ${amt}, unit: 'bch' }`;
+        }).filter(Boolean);
+
+        code += `        console.log('Sending bulk transaction to ${recipientList.length} recipients...');\n`;
+        code += `        const bulk_${safeId} = await ${senderNode.id.replace(/-/g, '_')}.send([\n`;
+        code += `            ${recipientList.join(',\n            ')}\n`;
+        code += `        ]);\n`;
+        code += `        console.log('Bulk sent! TxID:', bulk_${safeId}.txId);\n\n`;
+        break;
+      }
+
       case "tokenCreate": {
-        const creatorNode = sourceNodes.find(n => n?.type === 'account');
+        const creatorNode = sourceNodes.find(n => n?.type === 'account') || accountNodes[0];
         if (!creatorNode) continue;
-        const amount = node.data.config.amount || 1000000n;
-        const commitment = node.data.config.commitment || "";
-        const capability = node.data.config.capability || "none";
-        code += `        console.log('Creating CashToken...');\n`;
-        code += `        const genesis_${node.id.replace(/-/g, '_')} = await ${creatorNode.id.replace(/-/g, '_')}.tokenGenesis({\n`;
+        const name = config.name || "My Token";
+        const symbol = config.symbol || "TKN";
+        const amount = config.amount || 1000000;
+        const capability = config.capability || "none";
+        const commitment = config.commitment || "";
+
+        code += `        console.log('Generating CashToken: ${name} (${symbol})...');\n`;
+        code += `        const genesis_${safeId} = await ${creatorNode.id.replace(/-/g, '_')}.tokenGenesis({\n`;
         code += `            cashaddr: ${creatorNode.id.replace(/-/g, '_')}.cashaddr,\n`;
         code += `            amount: ${amount}n,\n`;
-        code += `            commitment: "${commitment}",\n`;
         code += `            capability: "${capability}",\n`;
+        code += `            commitment: "${commitment}",\n`;
         code += `            value: 1000\n`;
         code += `        });\n`;
-        code += `        console.log('Token created! TokenId:', genesis_${node.id.replace(/-/g, '_')}.tokenIds[0]);\n\n`;
+        code += `        console.log('Token created! ID:', genesis_${safeId}.tokenId);\n\n`;
         break;
       }
-      case "tokenTransfer": {
-        const senderNode = sourceNodes.find(n => n?.type === 'account');
-        if (!senderNode) continue;
-        const receiver = node.data.config.receiver || "RECEIVER_BCH_ADDRESS";
-        const amount = node.data.config.amount || 0;
-        const tokenId = node.data.config.tokenId || "TOKEN_ID";
-        code += `        console.log('Transferring CashTokens...');\n`;
-        code += `        const transfer_${node.id.replace(/-/g, '_')} = await ${senderNode.id.replace(/-/g, '_')}.send([\n`;
-        code += `            new TokenSendRequest({\n`;
-        code += `                cashaddr: "${receiver}",\n`;
-        code += `                amount: ${amount}n,\n`;
-        code += `                tokenId: "${tokenId}",\n`;
-        code += `                value: 1000\n`;
-        code += `            })\n`;
-        code += `        ]);\n`;
-        code += `        console.log('Tokens transferred! TxID:', transfer_${node.id.replace(/-/g, '_')}.txId);\n\n`;
+
+      case "tokenMint": {
+        const minterNode = sourceNodes.find(n => n?.type === 'account') || accountNodes[0];
+        if (!minterNode) continue;
+        const tokenId = config.tokenId || "CATEGORY_ID";
+        const amount = config.amount || 1000000;
+        const receiver = config.receiver || "";
+
+        code += `        console.log('Minting tokens for ${tokenId}...');\n`;
+        code += `        const mint_${safeId} = await ${minterNode.id.replace(/-/g, '_')}.tokenMint("${tokenId}", {\n`;
+        code += `            cashaddr: "${receiver}" || ${minterNode.id.replace(/-/g, '_')}.cashaddr,\n`;
+        code += `            amount: ${amount}n,\n`;
+        code += `            value: 1000\n`;
+        code += `        });\n`;
+        code += `        console.log('Minted! TxID:', mint_${safeId}.txId);\n\n`;
         break;
       }
+
+      case "tokenBurn": {
+        const burnerNode = sourceNodes.find(n => n?.type === 'account') || accountNodes[0];
+        if (!burnerNode) continue;
+        const tokenId = config.tokenId || "CATEGORY_ID";
+        const amount = config.amount || 1;
+
+        code += `        console.log('Burning tokens for ${tokenId}...');\n`;
+        code += `        const burn_${safeId} = await ${burnerNode.id.replace(/-/g, '_')}.tokenBurn({\n`;
+        code += `            tokenId: "${tokenId}",\n`;
+        code += `            amount: ${amount}n\n`;
+        code += `        });\n`;
+        code += `        console.log('Burned! TxID:', burn_${safeId}.txId);\n\n`;
+        break;
+      }
+
       case "opReturn": {
-        const senderNode = sourceNodes.find(n => n?.type === 'account');
+        const senderNode = sourceNodes.find(n => n?.type === 'account') || accountNodes[0];
         if (!senderNode) continue;
-        const message = node.data.config.message || "Hello BCH!";
-        code += `        console.log('Sending OP_RETURN message...');\n`;
-        code += `        const opreturn_${node.id.replace(/-/g, '_')} = await ${senderNode.id.replace(/-/g, '_')}.send([\n`;
+        const message = config.message || "Hello BCH!";
+        code += `        console.log('Sending OP_RETURN: "${message}"');\n`;
+        code += `        const op_${safeId} = await ${senderNode.id.replace(/-/g, '_')}.send([\n`;
         code += `            ["OP_RETURN", "${message}"]\n`;
         code += `        ]);\n`;
-        code += `        console.log('OP_RETURN sent! TxID:', opreturn_${node.id.replace(/-/g, '_')}.txId);\n\n`;
+        code += `        console.log('OP_RETURN sent! TxID:', op_${safeId}.txId);\n\n`;
         break;
       }
-      case "getBalance": {
-        const accountNode = sourceNodes.find(n => n?.type === 'account');
-        if (!accountNode) continue;
-        code += `        const balance_${node.id.replace(/-/g, '_')} = await ${accountNode.id.replace(/-/g, '_')}.getBalance();\n`;
-        code += `        console.log('Balance check:', balance_${node.id.replace(/-/g, '_')});\n\n`;
+
+      case "priceFeed": {
+        const nodeForContext = sourceNodes.find(n => n?.type === 'account') || accountNodes[0];
+        if (!nodeForContext) continue;
+        code += `        const rate_${safeId} = await ${nodeForContext.id.replace(/-/g, '_')}.getUsdRate();\n`;
+        code += `        console.log('Current BCH Price: $' + rate_${safeId} + ' USD');\n\n`;
         break;
       }
+
+      case "delay": {
+        const seconds = config.seconds || 5;
+        code += `        console.log('Waiting for ${seconds} seconds...');\n`;
+        code += `        await new Promise(resolve => setTimeout(resolve, ${seconds} * 1000));\n\n`;
+        break;
+      }
+
       case "waitForBalance": {
-        const accountNode = sourceNodes.find(n => n?.type === 'account');
+        const accountNode = sourceNodes.find(n => n?.type === 'account') || accountNodes[0];
         if (!accountNode) continue;
-        const targetBalance = node.data.config.targetBalance || 0.001;
-        code += `        console.log('Waiting for balance to reach ${targetBalance} BCH...');\n`;
-        code += `        const actualBalance_${node.id.replace(/-/g, '_')} = await ${accountNode.id.replace(/-/g, '_')}.waitForBalance(${targetBalance}, 'bch');\n`;
-        code += `        console.log('Target balance reached:', actualBalance_${node.id.replace(/-/g, '_')});\n\n`;
+        const target = config.targetBalance || 0.001;
+        code += `        console.log('Waiting for balance to reach ${target} BCH...');\n`;
+        code += `        const bal_${safeId} = await ${accountNode.id.replace(/-/g, '_')}.waitForBalance(${target}, 'bch');\n`;
+        code += `        console.log('Target reached! Balance:', bal_${safeId});\n\n`;
         break;
       }
     }
   }
 
+  code += `        console.log('Flow execution successful.');\n`;
   code += `    } catch (error) {\n`;
   code += `        console.error('Error:', error.message);\n`;
-  code += `        throw error;\n`;
   code += `    }\n`;
   code += `}\n\n`;
-  code += `main().catch(error => {\n`;
-  code += `    console.error('Fatal error:', error);\n`;
-  code += `    process.exit(1);\n`;
-  code += `});\n`;
+  code += `main();\n`;
 
   return code;
 };

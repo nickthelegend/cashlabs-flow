@@ -29,6 +29,12 @@ import {
   ConditionNode,
   OutputNode,
   ExecuteTxnNode,
+  MultiSendNode,
+  TokenMintNode,
+  TokenBurnNode,
+  PriceNode,
+  DelayNode,
+  PrepareWalletNode
 } from "./nodes/bch-nodes"
 import { NodePropertiesPanel } from "./node-properties-panel"
 import {
@@ -46,7 +52,12 @@ import {
   ArrowRightLeft,
   FileText,
   Zap,
-  Trash2
+  Trash2,
+  UserPlus,
+  Clock3,
+  Flame,
+  TrendingUp,
+  Hammer
 } from "lucide-react"
 
 interface FlowBuilderProps {
@@ -62,10 +73,16 @@ interface FlowBuilderProps {
 
 const nodeData = [
   { id: "account", label: "BCH WALLET", icon: Wallet, color: "text-blue-400" },
+  { id: "prepareWallet", label: "PREPARE WALLET", icon: Hammer, color: "text-orange-400" },
   { id: "payment", label: "SEND BCH", icon: Send, color: "text-green-400" },
+  { id: "multiSend", label: "MULTI-SEND", icon: UserPlus, color: "text-emerald-400" },
   { id: "tokenCreate", label: "CREATE TOKEN", icon: PlusSquare, color: "text-yellow-400" },
+  { id: "tokenMint", label: "MINT TOKEN", icon: PlusSquare, color: "text-amber-400" },
   { id: "tokenTransfer", label: "TRANSFER TOKEN", icon: ArrowRightLeft, color: "text-purple-400" },
+  { id: "tokenBurn", label: "BURN TOKEN", icon: Flame, color: "text-rose-400" },
   { id: "opReturn", label: "OP_RETURN", icon: FileText, color: "text-orange-400" },
+  { id: "priceFeed", label: "PRICE FEED", icon: TrendingUp, color: "text-blue-400" },
+  { id: "delay", label: "DELAY", icon: Clock3, color: "text-indigo-400" },
   { id: "executeTxn", label: "EXECUTE", icon: Zap, color: "text-red-400" },
 ]
 
@@ -74,6 +91,7 @@ const defaultViewport = { x: 0, y: 0, zoom: 1 }
 
 const nodeTypes: NodeTypes = {
   account: AccountNode,
+  prepareWallet: PrepareWalletNode,
   payment: PaymentNode,
   tokenTransfer: TokenTransferNode,
   tokenCreate: TokenCreateNode,
@@ -83,6 +101,11 @@ const nodeTypes: NodeTypes = {
   condition: ConditionNode,
   output: OutputNode,
   executeTxn: ExecuteTxnNode,
+  multiSend: MultiSendNode,
+  tokenMint: TokenMintNode,
+  tokenBurn: TokenBurnNode,
+  priceFeed: PriceNode,
+  delay: DelayNode,
 }
 
 export function FlowBuilder({
@@ -247,7 +270,7 @@ export function FlowBuilder({
 
       {/* Main Sidebar (Add Tile) */}
       <div
-        className={`transition-all duration-300 ease-in-out h-full ${isSidebarOpen ? 'w-[320px] opacity-100 translate-x-0' : 'w-0 opacity-0 -translate-x-full'}`}
+        className={`transition-all duration-300 ease-in-out h-full ${isSidebarOpen ? 'w-[260px] opacity-100 translate-x-0' : 'w-0 opacity-0 -translate-x-full'}`}
       >
         <NodeSidebar
           type={type}
@@ -368,12 +391,18 @@ export function FlowBuilder({
 function getDefaultConfig(nodeType: string) {
   const configs: Record<string, any> = {
     account: { wif: null, address: null },
+    prepareWallet: {},
     payment: { amount: 0.001, receiver: null },
+    multiSend: { recipients: "" },
     tokenTransfer: { tokenId: null, amount: 1, receiver: null },
-    tokenCreate: { amount: 1000000, commitment: "", capability: "none" },
+    tokenCreate: { name: "My Token", symbol: "MTK", amount: 1000000, commitment: "", capability: "none" },
+    tokenMint: { tokenId: null, amount: 1000000, receiver: null },
+    tokenBurn: { tokenId: null, amount: 1 },
     opReturn: { message: "Hello BCH!" },
     getBalance: {},
     waitForBalance: { targetBalance: 0.001 },
+    priceFeed: { pair: "BCH/USD" },
+    delay: { seconds: 5 },
     condition: { condition: "balance", operator: ">", value: 0 },
     output: { format: "JSON" },
     executeTxn: { network: "TestNet" },

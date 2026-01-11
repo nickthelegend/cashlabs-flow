@@ -32,6 +32,11 @@ interface NodeConfig {
   operator?: string
   value?: string
   format?: string
+  recipients?: string
+  name?: string
+  symbol?: string
+  seconds?: number
+  pair?: string
 }
 
 export function NodePropertiesPanel({ selectedNode, onClose, onUpdateNode }: NodePropertiesPanelProps) {
@@ -162,8 +167,32 @@ export function NodePropertiesPanel({ selectedNode, onClose, onUpdateNode }: Nod
         return (
           <div className="space-y-4">
             <div>
+              <Label htmlFor="name" className="text-white">
+                Token Name
+              </Label>
+              <Input
+                id="name"
+                value={config.name || ""}
+                onChange={(e) => setConfig({ ...config, name: e.target.value })}
+                placeholder="My Awesome Token"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+            <div>
+              <Label htmlFor="symbol" className="text-white">
+                Token Symbol
+              </Label>
+              <Input
+                id="symbol"
+                value={config.symbol || ""}
+                onChange={(e) => setConfig({ ...config, symbol: e.target.value })}
+                placeholder="WAT"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+            <div>
               <Label htmlFor="amount" className="text-white">
-                Fungible Token Amount
+                Initial Supply
               </Label>
               <Input
                 id="amount"
@@ -203,6 +232,144 @@ export function NodePropertiesPanel({ selectedNode, onClose, onUpdateNode }: Nod
                   <SelectItem value="minting">Minting</SelectItem>
                 </SelectContent>
               </Select>
+            </div>
+          </div>
+        )
+
+      case "multiSend":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="recipients" className="text-white">
+                Recipients (Address, Amount)
+              </Label>
+              <Textarea
+                id="recipients"
+                value={config.recipients || ""}
+                onChange={(e) => setConfig({ ...config, recipients: e.target.value })}
+                placeholder="address1, 0.001&#10;address2, 0.005"
+                className="bg-gray-800 border-gray-600 text-white h-32"
+              />
+              <p className="text-xs text-gray-500 mt-1">
+                Enter one recipient per line: address, amount
+              </p>
+            </div>
+          </div>
+        )
+
+      case "tokenMint":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="tokenId" className="text-white">
+                Token ID (Category)
+              </Label>
+              <Input
+                id="tokenId"
+                value={config.tokenId || ""}
+                onChange={(e) => setConfig({ ...config, tokenId: e.target.value })}
+                placeholder="Category ID of the token"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+            <div>
+              <Label htmlFor="amount" className="text-white">
+                Amount to Mint
+              </Label>
+              <Input
+                id="amount"
+                type="number"
+                value={config.amount || ""}
+                onChange={(e) => setConfig({ ...config, amount: Number.parseInt(e.target.value) })}
+                placeholder="1000000"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+            <div>
+              <Label htmlFor="receiver" className="text-white">
+                Receiver Address
+              </Label>
+              <Input
+                id="receiver"
+                value={config.receiver || ""}
+                onChange={(e) => setConfig({ ...config, receiver: e.target.value })}
+                placeholder="bitcoincash:qr..."
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+          </div>
+        )
+
+      case "tokenBurn":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="tokenId" className="text-white">
+                Token ID (Category)
+              </Label>
+              <Input
+                id="tokenId"
+                value={config.tokenId || ""}
+                onChange={(e) => setConfig({ ...config, tokenId: e.target.value })}
+                placeholder="Category ID of the token"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+            <div>
+              <Label htmlFor="amount" className="text-white">
+                Amount to Burn
+              </Label>
+              <Input
+                id="amount"
+                type="number"
+                value={config.amount || ""}
+                onChange={(e) => setConfig({ ...config, amount: Number.parseInt(e.target.value) })}
+                placeholder="1"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
+            </div>
+          </div>
+        )
+
+      case "priceFeed":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="pair" className="text-white">
+                Price Pair
+              </Label>
+              <Select
+                value={config.pair || "BCH/USD"}
+                onValueChange={(value) => setConfig({ ...config, pair: value })}
+              >
+                <SelectTrigger className="bg-gray-800 border-gray-600 text-white">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent className="bg-gray-800 border-gray-600">
+                  <SelectItem value="BCH/USD">BCH / USD</SelectItem>
+                  <SelectItem value="BCH/EUR">BCH / EUR</SelectItem>
+                  <SelectItem value="BCH/BTC">BCH / BTC</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        )
+
+      case "delay":
+        return (
+          <div className="space-y-4">
+            <div>
+              <Label htmlFor="seconds" className="text-white">
+                Delay Seconds
+              </Label>
+              <Input
+                id="seconds"
+                type="number"
+                value={config.seconds || 5}
+                onChange={(e) => setConfig({ ...config, seconds: Number.parseInt(e.target.value) })}
+                placeholder="5"
+                className="bg-gray-800 border-gray-600 text-white"
+              />
             </div>
           </div>
         )
